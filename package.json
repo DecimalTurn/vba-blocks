@@ -4,8 +4,8 @@
 	"repository": "https://github.com/vba-blocks/vba-blocks.git",
 	"author": "Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)",
 	"license": "MIT",
-	"bin": "lib/vba-blocks.js",
-	"main": "lib/index.js",
+	"bin": "src/vba-blocks.js",
+	"main": "src/index.js",
 	"scripts": {
 		"format": "prettier --write \"**/*.{ts,js}\"",
 		"test": "jest --runInBand",
