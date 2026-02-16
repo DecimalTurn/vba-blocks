@@ -34,7 +34,8 @@ export class RunError extends Error {
 	}
 }
 
-export function isRunError(error: Error | RunError): error is RunError {
+export function isRunError(error: unknown): error is RunError {
+	if (!(error instanceof Error)) return false;
 	return has(error, "result");
 }
 
@@ -77,7 +78,15 @@ export async function run(
 		const { stdout, stderr } = await exec(command);
 		result = toResult(stdout, stderr);
 	} catch (err) {
-		result = toResult(err.stdout, err.stderr, err);
+		const error_output = typeof err === "object" && err ? err : {};
+		const stdout = has(error_output, "stdout") ? (error_output as any).stdout : "";
+		const stderr = has(error_output, "stderr") ? (error_output as any).stderr : "";
+		const error = err instanceof Error ? err : new Error(String(err));
+		result = toResult(
+			typeof stdout === "string" ? stdout : "",
+			typeof stderr === "string" ? stderr : "",
+			error
+		);
 	}
 
 	if (!result.success) {

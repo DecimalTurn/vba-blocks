@@ -83,10 +83,11 @@ export async function createTarget(project: Project, target: Target): Promise<st
 		await ensureDir(project.paths.staging);
 		await zip(target.path!, file);
 	} catch (err) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		throw new CliError(
 			ErrorCode.TargetCreateFailed,
 			`Failed to create project for target "${target.name}".`,
-			err
+			error
 		);
 	}
 
@@ -119,10 +120,11 @@ export async function importTarget(
 	try {
 		await importGraph(project, target, import_graph, file, options);
 	} catch (err) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		throw new CliError(
 			ErrorCode.TargetImportFailed,
 			`Failed to import project for target "${target.name}".`,
-			err
+			error
 		);
 	} finally {
 		await remove(staging);
@@ -163,6 +165,7 @@ export async function restoreTarget(project: Project, target: Target) {
 	try {
 		await copy(backup, file);
 	} catch (err) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		throw new CliError(
 			ErrorCode.TargetRestoreFailed,
 			dedent`
@@ -170,7 +173,7 @@ export async function restoreTarget(project: Project, target: Target) {
 
         The previous version can be moved back manually, if desired.
       `,
-			err
+			error
 		);
 	}
 }

@@ -82,10 +82,11 @@ export class RegistrySource implements Source {
 			try {
 				await download(url, unverifiedFile);
 			} catch (err) {
+				const error = err instanceof Error ? err : new Error(String(err));
 				throw new CliError(
 					ErrorCode.SourceDownloadFailed,
 					`Failed to download "${registration.source}".`,
-					err
+					error
 				);
 			}
 
@@ -144,10 +145,11 @@ export async function pullIndex(local: string, remote: string) {
 		try {
 			await clone(remote, basename(local), dirname(local));
 		} catch (err) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			throw new CliError(
 				ErrorCode.RegistryCloneFailed,
 				`Failed to clone registry from ${remote}`,
-				err
+				error
 			);
 		}
 	}

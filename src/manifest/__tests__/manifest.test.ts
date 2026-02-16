@@ -179,7 +179,8 @@ test("throws for invalid syntax", async () => {
 	try {
 		await loadManifest(invalidManifest);
 	} catch (err) {
-		expect(err.message.replace(FIXTURES, "fixtures")).toMatchSnapshot();
+		const error = err instanceof Error ? err : new Error(String(err));
+		expect(error.message.replace(FIXTURES, "fixtures")).toMatchSnapshot();
 	}
 });
 

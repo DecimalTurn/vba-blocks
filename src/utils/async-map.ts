@@ -5,5 +5,13 @@ type AsyncFn<TValue> = (input: TValue) => Promise<TValue>;
 type Fn<TValue> = (input: TValue) => TValue;
 
 export function asyncMap<TValue>(...fns: Array<Fn<TValue> | AsyncFn<TValue>>): AsyncFn<TValue> {
-	return value => fns.reduce(async (memo, fn) => fn(await memo), Promise.resolve(value));
+	return async value => {
+		let memo = value;
+
+		for (const fn of fns) {
+			memo = await fn(memo);
+		}
+
+		return memo;
+	};
 }
