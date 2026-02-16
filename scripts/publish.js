@@ -5,7 +5,6 @@ const execFile = promisify(require("child_process").execFile);
 const { readFile, ensureFile, pathExists, writeFile } = require("fs-extra");
 const mri = require("mri");
 const tmpDir = promisify(require("tmp").dir);
-const { parse } = require("toml-patch");
 const joinUrl = require("url-join");
 const checksum = require("./lib/checksum");
 const download = require("./lib/download");
@@ -33,6 +32,7 @@ async function main() {
 	const manifest_path = join(dir, "vba-block.toml");
 	assert(await pathExists(manifest_path), `vba-block.toml not found in input directory "${input}"`);
 
+	const { parse } = await import("@decimalturn/toml-patch");
 	const manifest = parse(await readFile(manifest_path, "utf8"));
 	assert(manifest.package, `publish only supports packages ([package] in vba-block.toml)`);
 

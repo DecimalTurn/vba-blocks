@@ -28,6 +28,7 @@
 		"testEnvironment": "node"
 	},
 	"dependencies": {
+		"@decimalturn/toml-patch": "^0.7.0",
 		"@timhall/ansi-colors": "^5.0.0",
 		"@timhall/dedent": "^0.9.1",
 		"archiver": "^3",
@@ -48,7 +49,6 @@
 		"sanitize-filename": "^1",
 		"semver": "^5",
 		"tmp": "^0.0",
-		"toml-patch": "^0.2",
 		"walk-sync": "^1",
 		"xml-js": "^1.6"
 	},

@@ -1,7 +1,6 @@
 const { dirname, resolve, relative, join } = require("path");
 const { ensureDir, pathExists, readFile, remove } = require("fs-extra");
 const mri = require("mri");
-const { parse } = require("toml-patch");
 const ls = require("./lib/ls");
 const zip = require("./lib/zip");
 const sanitizeName = require("./lib/sanitize-name");
@@ -34,6 +33,7 @@ async function main() {
 		throw new Error(`vba-block.toml not found in input directory "${input}"`);
 	}
 
+	const { parse } = await import("@decimalturn/toml-patch");
 	const manifest = parse(await readFile(manifest_path, "utf8"));
 	if (!manifest.package) {
 		throw new Error(`pack only supports packages ([package] in vba-block.toml)`);
