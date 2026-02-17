@@ -1,0 +1,31 @@
+# Taplo configuration for Even Better TOML extension
+# https://taplo.tamasfe.dev/configuration/
+
+# Exclude patterns for files that should not be formatted or validated
+exclude = [
+    "vendor/**/*.toml",
+    "**/node_modules/**/*.toml",
+    "tests/__fixtures__/projects/invalid-manifest/vba-block.toml"
+]
+
+# Include patterns (optional, all TOML files are included by default)
+# include = ["**/*.toml"]
+
+# Formatting options
+[formatting]
+# Align entries vertically
+align_entries = false
+# Allow more than 80 characters per line
+column_width = 120
+# Indent tables
+indent_tables = false
+# Add trailing comma
+trailing_comma = true
+# Reorder keys alphabetically
+reorder_keys = false
+# Compact arrays (single line)
+compact_arrays = true
+# Compact inline tables
+compact_inline_tables = false
+# Indent string
+indent_string = "    "
