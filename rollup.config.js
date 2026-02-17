@@ -14,7 +14,7 @@ function shebang() {
 		name: "shebang",
 		renderChunk(code, chunk) {
 			if (chunk.facadeModuleId && chunk.facadeModuleId.includes("vba-blocks.ts")) {
-				return "#!/usr/bin/env node\n" + code;
+				return { code: "#!/usr/bin/env node\n" + code, map: null };
 			}
 			return null;
 		},

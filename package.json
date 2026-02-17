@@ -42,7 +42,8 @@
 	},
 	"jest": {
 		"preset": "ts-jest",
-		"testEnvironment": "node"
+		"testEnvironment": "node",
+		"testPathIgnorePatterns": ["/node_modules/", "/lib/"]
 	},
 	"dependencies": {
 		"@decimalturn/toml-patch": "^0.7.0",
