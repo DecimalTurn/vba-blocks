@@ -4,23 +4,13 @@ A package manager and build tool for VBA.
 
 ## Installation
 
-**Windows**
-
-In powershell, run the following:
+Requires [Node.js](https://nodejs.org/) v18 or later.
 
 ```txt
-iwr https://vba-blocks.com/install.ps1 | iex
+npm install -g @vbapm/core
 ```
 
-**Mac**
-
-In terminal, run the following:
-
-```txt
-curl -fsSL https://vba-blocks.com/install.sh | sh
-```
-
-For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vba-blocks to work correctly:
+**Mac:** For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vba-blocks to work correctly:
 
 <details>
   <summary>Trust access to the VBA project object model</summary>
@@ -33,9 +23,21 @@ For more recent versions of Office for Mac, you will need to trust access to the
  </ol>
 </details>
 
-If you run into any issues during installation, please see the [known issues](https://github.com/vba-blocks/installer#known-issues) for the installer or [create a new issue](https://github.com/vba-blocks/installer/issues/new) with details about what's happening.
-
 :rocket: You're ready to go! Open a new command-line session (cmd / terminal) and try `vba --help`
+
+### Programmatic Usage
+
+You can also use `@vbapm/core` as a library (e.g. from a VS Code extension):
+
+```js
+const { buildProject, loadProject, env } = require("@vbapm/core");
+
+// Override working directory
+env.cwd = "/path/to/project";
+
+const project = await loadProject();
+await buildProject(project);
+```
 
 ## Usage
 
@@ -225,8 +227,7 @@ Scripting = { version = "1.0", guid = "{...}" }
 ### Prerequisites
 
 1. `git clone` this repo
-2. Install [node](https://nodejs.org/) v12.19.0 or later
-3. Install node-gyp dependencies for [Mac](https://github.com/nodejs/node-gyp#on-macos) or [Windows](https://github.com/nodejs/node-gyp#on-windows)
+2. Install [Node.js](https://nodejs.org/) v18 or later
 
 ### Build
 
@@ -241,5 +242,5 @@ Scripting = { version = "1.0", guid = "{...}" }
 
 ### Release
 
-1. Run `npm version`
-2. Run `npm run release`
+1. Run `npm version patch` (or `minor`/`major`)
+2. Run `npm publish --access public`
