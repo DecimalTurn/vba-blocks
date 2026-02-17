@@ -26,7 +26,7 @@ afterEach(() => {
 const dependency = {
 	name: "json",
 	version: "^2",
-	registry: "vba-blocks"
+	registry: "vbapm"
 };
 
 test("should get dependency from clean state", async () => {
@@ -55,13 +55,13 @@ test("should include preferred with resolved", async () => {
 		{
 			name: "json",
 			id: "json@2.0.1",
-			source: "registry+vba-blocks#<hash>",
+			source: "registry+vbapm#<hash>",
 			version: "2.0.1",
 			dependencies: [
 				{
 					name: "dictionary",
 					version: "^1",
-					registry: "vba-blocks"
+					registry: "vbapm"
 				}
 			]
 		}

@@ -21,10 +21,10 @@ export interface InitOptions {
 export async function initProject(options: InitOptions) {
 	let { name, dir = env.cwd, target: targetType, from, pkg: asPackage, git } = options;
 
-	if (await pathExists(join(dir, "vba-block.toml"))) {
+	if (await pathExists(join(dir, "vba_package.toml"))) {
 		throw new CliError(
 			ErrorCode.InitAlreadyInitialized,
-			`A vba-blocks project already exists in this directory.`
+			`A vbapm project already exists in this directory.`
 		);
 	}
 
@@ -53,8 +53,8 @@ export async function initProject(options: InitOptions) {
 		throw new CliError(
 			ErrorCode.InitTargetRequired,
 			dedent`
-        --target or --from is required for vba-blocks projects.
-        (e.g. vba-blocks init --target xlsm)
+        --target or --from is required for vbapm projects.
+        (e.g. vbapm init --target xlsm)
       `
 		);
 	}

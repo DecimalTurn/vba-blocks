@@ -11,7 +11,7 @@ import { Version } from "./version";
 
   - registry: version | { version, registry? }
 
-    Registry (default = "vba-blocks"):
+    Registry (default = "vbapm"):
     index + packages are loading in config and used for resolve and fetching
 
   - path: path
@@ -44,7 +44,7 @@ export interface GitDependency extends DependencyDetails {
 
 export type Dependency = RegistryDependency | PathDependency | GitDependency;
 
-const EXAMPLE = `Example vba-block.toml:
+const EXAMPLE = `Example vba_package.toml:
 
   [dependencies]
   a = "^1.0.0"
@@ -66,7 +66,7 @@ export function parseDependency(name: string, value: Version | any, dir: string)
 	if (isString(value)) value = { version: value };
 
 	let {
-		registry = "vba-blocks",
+		registry = "vbapm",
 		version,
 		path,
 		git,
@@ -118,7 +118,7 @@ export function formatDependencies(dependencies: Dependency[], dir: string): obj
 	dependencies.forEach(dependency => {
 		if (isRegistryDependency(dependency)) {
 			const { name, registry, version } = dependency;
-			value[name] = registry !== "vba-blocks" ? { version, registry } : version;
+			value[name] = registry !== "vbapm" ? { version, registry } : version;
 		} else if (isPathDependency(dependency)) {
 			let { name, path } = dependency;
 			path = relative(dir, path);

@@ -13,7 +13,7 @@ function shebang() {
 	return {
 		name: "shebang",
 		renderChunk(code, chunk) {
-			if (chunk.facadeModuleId && chunk.facadeModuleId.includes("vba-blocks.ts")) {
+			if (chunk.facadeModuleId && chunk.facadeModuleId.includes("vbapm.ts")) {
 				return { code: "#!/usr/bin/env node\n" + code, map: null };
 			}
 			return null;
@@ -22,7 +22,7 @@ function shebang() {
 			const fs = require("fs");
 			const path = require("path");
 			for (const [fileName] of Object.entries(bundle)) {
-				if (fileName === "vba-blocks.js") {
+				if (fileName === "vbapm.js") {
 					const filePath = path.resolve(options.dir, fileName);
 					try {
 						fs.chmodSync(filePath, 0o755);
@@ -37,7 +37,7 @@ function shebang() {
 
 export default [
 	{
-		input: ["src/index.ts", "src/bin/vba-blocks.ts", "src/debug.ts"],
+		input: ["src/index.ts", "src/bin/vbapm.ts", "src/debug.ts"],
 		output: {
 			format: "cjs",
 			dir: "lib",

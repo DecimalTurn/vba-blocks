@@ -5,7 +5,7 @@
 exclude = [
     "vendor/**/*.toml",
     "**/node_modules/**/*.toml",
-    "tests/__fixtures__/projects/invalid-manifest/vba-block.toml"
+    "tests/__fixtures__/projects/invalid-manifest/vba_package.toml"
 ]
 
 # Include patterns (optional, all TOML files are included by default)

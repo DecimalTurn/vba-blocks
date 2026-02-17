@@ -5,7 +5,7 @@ test("gets registration for dependency", async () => {
 		id: "a@1.0.0",
 		name: "a",
 		version: "1.0.0",
-		source: "registry+vba-blocks#<hash>",
+		source: "registry+vbapm#<hash>",
 		dependencies: []
 	};
 	const graph: DependencyGraph = [a];
@@ -14,14 +14,14 @@ test("gets registration for dependency", async () => {
 		getRegistration(graph, {
 			name: "a",
 			version: "^1.0.0",
-			registry: "vba-blocks"
+			registry: "vbapm"
 		})
 	).toEqual(a);
 	expect(
 		getRegistration(graph, {
 			name: "b",
 			version: "^1.0.0",
-			registry: "vba-blocks"
+			registry: "vbapm"
 		})
 	).toBeUndefined();
 });

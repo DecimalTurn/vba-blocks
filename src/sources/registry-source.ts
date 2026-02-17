@@ -18,7 +18,7 @@ import { unzip } from "../utils/zip";
 import { getRegistrationId, getRegistrationSource, Registration } from "./registration";
 import { Source } from "./source";
 
-const debug = env.debug("vba-blocks:registry-source");
+const debug = env.debug("vbapm:registry-source");
 
 export interface RegistryOptions {
 	name: string;

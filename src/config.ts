@@ -22,9 +22,9 @@ export interface ConfigValue {
 const empty: ConfigValue = { registry: {}, flags: {} };
 const defaults: ConfigValue = {
 	registry: {
-		"vba-blocks": {
-			index: "https://github.com/vba-blocks/registry",
-			packages: "https://packages.vba-blocks.com"
+		"vbapm": {
+			index: "https://github.com/vbapm/registry",
+			packages: "https://packages.vbapm.com"
 		}
 	},
 	flags: {}
@@ -34,7 +34,7 @@ const defaults: ConfigValue = {
  * Load config, from local, user, and environment values
  *
  * - env:config/config.toml (user)
- * - Search for .vba-blocks/config.toml up from cwd (local)
+ * - Search for .vbapm/config.toml up from cwd (local)
  * - Load VBA_BLOCKS_* from environment (override)
  */
 export async function loadConfig(): Promise<Config> {
@@ -93,9 +93,9 @@ export async function readConfig(dir: string): Promise<ConfigValue | undefined> 
 }
 
 // Find config up from and including given dir
-// (looking for .vba-blocks/config.toml)
+// (looking for .vbapm/config.toml)
 export async function findConfig(dir: string): Promise<string | undefined> {
-	// TODO Search for .vba-blocks/config.toml starting at cwd
+	// TODO Search for .vbapm/config.toml starting at cwd
 	return;
 }
 

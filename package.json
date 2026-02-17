@@ -16,8 +16,8 @@
     "node": ">=18.0.0"
   },
   "bin": {
-    "vba-blocks": "lib/vba-blocks.js",
-    "vba": "lib/vba-blocks.js"
+    "vbapm": "lib/vbapm.js",
+    "vba": "lib/vbapm.js"
   },
   "main": "lib/index.js",
   "types": "lib/src/index.d.ts",
@@ -43,7 +43,7 @@
     "build": "rimraf lib && rollup -c && tsc -p tsconfig.build.json",
     "build:dev": "cross-env NODE_ENV=development rollup -c",
     "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
-    "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vba-blocks build",
+    "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vbapm build",
     "prepublishOnly": "npm run build",
     "postversion": "git push && git push --tags",
     "clean": "rimraf lib && rimraf dist && rimraf addins/build"

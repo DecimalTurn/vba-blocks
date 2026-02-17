@@ -151,7 +151,7 @@ vba run Messages.SayHi Tim
 Howdy Tim!
 ```
 
-## Manifest (vba-block.toml)
+## Manifest (vba_package.toml)
 
 ### [project] or [package]
 

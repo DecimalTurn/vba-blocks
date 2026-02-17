@@ -5,7 +5,7 @@ import { version as currentVersion } from "../package.json";
 import { cache } from "./cache";
 import { env } from "./env";
 
-const debug = env.debug("vba-blocks:installer");
+const debug = env.debug("vbapm:installer");
 
 const NPM_PACKAGE_NAME = "@vbapm/core";
 

@@ -1,0 +1,18 @@
+[project]
+name = "vbapm"
+version = "0.1.0"
+authors = ["Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)"]
+target = { type = "xlam", path = "targets/xlam" }
+
+[src]
+Build = "src/Build.bas"
+OfficeApplication = "src/OfficeApplication.cls"
+Output = "src/Output.bas"
+ThisWorkbook = "src/ThisWorkbook.cls"
+
+[dependencies]
+installer = { path = "vba-installer" }
+json = "^2"
+
+[references]
+VBIDE = { version = "5.3", guid = "{0002E157-0000-0000-C000-000000000046}" }

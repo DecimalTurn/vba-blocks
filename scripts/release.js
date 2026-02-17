@@ -31,10 +31,10 @@ async function main() {
 
 	console.log(`Creating release for ${tag}`);
 	const release = await octokit.repos.createRelease({
-		owner: "vba-blocks",
-		repo: "vba-blocks",
+		owner: "vbapm",
+		repo: "core",
 		tag_name: tag,
-		name: `vba-blocks v${version}`,
+		name: `vbapm v${version}`,
 		body,
 		prerelease,
 		draft
@@ -42,8 +42,8 @@ async function main() {
 
 	console.log("Uploading packages");
 	await Promise.all([
-		uploadAsset(join(__dirname, "../dist", `vba-blocks-win.zip`), release),
-		uploadAsset(join(__dirname, "../dist", `vba-blocks-mac.tar.gz`), release)
+		uploadAsset(join(__dirname, "../dist", `vbapm-win.zip`), release),
+		uploadAsset(join(__dirname, "../dist", `vbapm-mac.tar.gz`), release)
 	]);
 
 	console.log("Done!");

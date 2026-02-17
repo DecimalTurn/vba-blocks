@@ -5,7 +5,7 @@ Object {
   "dependencies": Array [
     Object {
       "name": "web",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^4",
     },
   ],

@@ -14,7 +14,7 @@ export class CliError extends Error {
 		}
 
 		// TODO
-		// message += `\nSee https://vba-blocks.com/errors/${code} for more information.`;
+		// message += `\nSee https://vbapm.com/errors/${code} for more information.`;
 
 		super(message);
 
@@ -77,7 +77,7 @@ export function manifestOk(value: any, message: string) {
 	const error = new CliError(
 		ErrorCode.ManifestInvalid,
 		dedent`
-      vba-blocks.toml is invalid:
+      vba_package.toml is invalid:
 
       ${message}
     `

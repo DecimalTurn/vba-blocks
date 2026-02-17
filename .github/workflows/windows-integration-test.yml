@@ -56,12 +56,12 @@ jobs:
           cd init-test
           vba init --package --name my-library --no-git
 
-          if (-not (Test-Path "vba-block.toml")) {
-            Write-Error "vba init FAILED: vba-block.toml not found"
+          if (-not (Test-Path "vba_package.toml")) {
+            Write-Error "vba init FAILED: vba_package.toml not found"
             exit 1
           }
 
-          $toml = Get-Content "vba-block.toml" -Raw
+          $toml = Get-Content "vba_package.toml" -Raw
           if ($toml -match 'name = "my-library"') {
             Write-Host "vba init PASSED: project name set correctly"
           } else {
@@ -144,8 +144,8 @@ jobs:
             exit 1
           }
 
-      # ── Build the vba-blocks addin (needed for import/export COM calls) ──
-      - name: Build vba-blocks addin
+      # ── Build the vbapm addin (needed for import/export COM calls) ──
+      - name: Build vbapm addin
         id: build-addin
         shell: pwsh
         continue-on-error: true
@@ -155,7 +155,7 @@ jobs:
       - name: Check addin build result
         shell: pwsh
         run: |
-          if (Test-Path "addins/build/vba-blocks.xlam") {
+          if (Test-Path "addins/build/vbapm.xlam") {
             Write-Host "Addin built successfully"
             echo "ADDIN_AVAILABLE=true" >> $env:GITHUB_ENV
           } else {
@@ -192,11 +192,11 @@ jobs:
           $basContent = ($basContent -split "`n" | ForEach-Object { $_.TrimStart() }) -join "`r`n"
           [System.IO.File]::WriteAllText("roundtrip-test/src/MyModule.bas", $basContent)
 
-          # Add the source to vba-block.toml
-          Add-Content -Path "roundtrip-test/vba-block.toml" -Value "`n[src]`nMyModule = `"src/MyModule.bas`""
+          # Add the source to vba_package.toml
+          Add-Content -Path "roundtrip-test/vba_package.toml" -Value "`n[src]`nMyModule = `"src/MyModule.bas`""
 
-          Write-Host "=== vba-block.toml ==="
-          Get-Content "roundtrip-test/vba-block.toml"
+          Write-Host "=== vba_package.toml ==="
+          Get-Content "roundtrip-test/vba_package.toml"
           Write-Host "`n=== src/MyModule.bas ==="
           Get-Content "roundtrip-test/src/MyModule.bas"
 
@@ -236,13 +236,13 @@ jobs:
           }
 
           # Verify the module is still referenced in the manifest
-          $toml = Get-Content "roundtrip-test/vba-block.toml" -Raw
+          $toml = Get-Content "roundtrip-test/vba_package.toml" -Raw
           if ($toml -match 'MyModule') {
-            Write-Host "Roundtrip PASSED: vba-block.toml still references MyModule"
+            Write-Host "Roundtrip PASSED: vba_package.toml still references MyModule"
           } else {
-            Write-Error "Roundtrip FAILED: vba-block.toml lost the MyModule reference"
-            Write-Host "=== vba-block.toml ==="
-            Get-Content "roundtrip-test/vba-block.toml"
+            Write-Error "Roundtrip FAILED: vba_package.toml lost the MyModule reference"
+            Write-Host "=== vba_package.toml ==="
+            Get-Content "roundtrip-test/vba_package.toml"
             exit 1
           }
 

@@ -50,9 +50,9 @@ export function getTarget(project: Project, targetType: string | undefined): Tar
         No default target found for project.
 
         Use --target TYPE for a blank target
-        or specify 'project.target' in vba-block.toml.
+        or specify 'project.target' in vba_package.toml.
 
-        Example vba-block.toml:
+        Example vba_package.toml:
 
         [project]
         target = "xlsm"

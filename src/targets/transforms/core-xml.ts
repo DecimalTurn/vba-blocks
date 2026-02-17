@@ -3,7 +3,7 @@ import { env } from "../../env";
 
 import { UnzipFile } from "../../utils/zip";
 
-const debug = env.debug("vba-blocks:target.transforms.core-xml");
+const debug = env.debug("vbapm:target.transforms.core-xml");
 const CORE_XML = /docProps[\/,\\]core\.xml/i;
 
 export default function transformCoreXml(file: UnzipFile): UnzipFile {

@@ -1,0 +1,176 @@
+import dedent from "@timhall/dedent";
+import { greenBright, redBright } from "@timhall/ansi-colors";
+import meant from "meant";
+import mri, { Args } from "mri";
+import { version } from "../../package.json";
+import { env } from "../env";
+import { cleanError, CliError, ErrorCode, isCliError } from "../errors";
+import { checkForUpdate, updateAvailable, updateVersion } from "../installer";
+import { Message } from "../messages";
+import { isRunError } from "../utils/run";
+import { joinCommas } from "../utils/text";
+
+Error.stackTraceLimit = Infinity;
+
+const debug = env.debug("vbapm:main");
+
+type Command = (args: Args) => Promise<void>;
+const commands: { [name: string]: () => Promise<Command> } = {
+	new: async () => (await import("./vbapm-new")).default,
+	init: async () => (await import("./vbapm-init")).default,
+	build: async () => (await import("./vbapm-build")).default,
+	test: async () => (await import("./vbapm-test")).default,
+	export: async () => (await import("./vbapm-export")).default,
+	run: async () => (await import("./vbapm-run")).default,
+	version: async () => (await import("./vbapm-version")).default
+};
+
+const args = mri(process.argv.slice(2), {
+	alias: {
+		v: "version",
+		h: "help"
+	}
+});
+
+if (args.debug) {
+	let debug = args.debug;
+	if (debug === true) debug = "*";
+	else if (Array.isArray(debug)) debug = debug.join(",");
+
+	const filters = (<string>debug).split(",").map(filter => `vbapm:${filter}`);
+	const existing = process.env.DEBUG ? process.env.DEBUG.split(",") : [];
+
+	process.env.DEBUG = existing.concat(filters).join(",");
+}
+
+const help = dedent`
+  vbapm v${version}
+
+  Usage: vbapm [command] [options]
+
+  Commands:
+    - new           Create a new project / package in a new directory
+    - init          Initialize a new project / package in the current directory
+    - build         Build project from manifest
+    - test          Run tests for built target
+    - export        Export src from built target
+    - run           Run macro in document / add-in
+    - help          Outputs this message or the help of the given command
+
+  Options:
+    -h, --help      Output usage information
+    -v, --version   Output the version number
+
+  Use 'vbapm help COMMAND' for help on specific commands.
+  Visit https://vbapm.com to learn more about vbapm.`;
+
+const updateAvailableMessage = () => dedent`
+  \n${greenBright("New Update!")} ${updateVersion()!}
+
+  A new version of vbapm is available.
+  Run "npm update -g @vbapm/core" to update.`;
+
+process.title = "vbapm";
+process.on("unhandledRejection", handleError);
+process.on("uncaughtException", handleError);
+
+main()
+	.then(() => process.exit(0))
+	.catch(handleError);
+
+async function main() {
+	let [command] = args._;
+
+	if (!command) {
+		if (args.version) console.log(version);
+		else {
+			console.log(help);
+
+			if (updateAvailable()) {
+				env.reporter.log(Message.UpdateAvailable, updateAvailableMessage());
+			}
+		}
+
+		return;
+	}
+
+	if (command === "help") {
+		command = args._[1];
+
+		if (!command) {
+			console.log(help);
+			return;
+		}
+
+		args._ = [command];
+		args.help = true;
+	}
+	command = command.toLowerCase();
+
+	const available = Object.keys(commands);
+	if (!available.includes(command)) {
+		const approximate = meant(command, available);
+		const did_you_mean = approximate.length
+			? `, did you mean "${meant(command, available)}"?`
+			: ".";
+		const list = joinCommas(available.map(name => `"${name}"`));
+
+		throw new CliError(
+			ErrorCode.UnknownCommand,
+			dedent`
+        Unknown command "${command}"${did_you_mean}
+
+        Available commands are ${list}.
+        Try "vbapm help" for more information.
+      `
+		);
+	}
+
+	// Remove command from args
+	args._ = args._.slice(1);
+
+	let subcommand: (args: Args) => Promise<void>;
+	try {
+		debug(`loading "./vbapm-${command}.js"`);
+		subcommand = await commands[command]();
+	} catch (err) {
+		const error = err instanceof Error ? err : new Error(String(err));
+		throw new Error(`Failed to load command "${command}".\n${error.stack}`);
+	}
+
+	debug(`starting "${command}" with args ${JSON.stringify(args)}`);
+	const [has_update_available] = await Promise.all([checkForUpdate(), subcommand(args)]);
+
+	if (has_update_available) {
+		env.reporter.log(Message.UpdateAvailable, updateAvailableMessage());
+	}
+}
+
+export function handleError(err: Error | CliError | any, _promise?: Promise<any>) {
+	const { message } = cleanError(err);
+
+	console.error(`${redBright("ERROR")} ${message}`);
+
+	// TODO
+	// if (err.code) {
+	//   console.log(
+	//     chalk`\n{dim Visit https://vbapm.com/errors/${
+	//       err.code
+	//     } for more information}`
+	//   );
+	// }
+
+	// Couldn't import debug, so log directly if debugging anything
+	if (process.env.DEBUG) {
+		console.error(err);
+
+		if (isCliError(err) && err.underlying) {
+			console.error("underlying", err.underlying);
+		}
+		if (isRunError(err)) {
+			console.error("result", err.result);
+		}
+	}
+
+	process.exit(1);
+}

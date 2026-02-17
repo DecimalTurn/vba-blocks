@@ -69,7 +69,7 @@ export interface TmpOptions {
 }
 
 export const tmpFile = jest.fn(async (options: TmpOptions = {}) => {
-	let { dir, prefix = "vba-blocks-" } = options;
+	let { dir, prefix = "vbapm-" } = options;
 	if (!dir) {
 		({ tmpdir: dir } = require("tmp"));
 	}
@@ -78,7 +78,7 @@ export const tmpFile = jest.fn(async (options: TmpOptions = {}) => {
 });
 
 export const tmpFolder = jest.fn(async (options: TmpOptions = {}) => {
-	let { dir, prefix = "vba-blocks-" } = options;
+	let { dir, prefix = "vbapm-" } = options;
 	if (!dir) {
 		({ tmpdir: dir } = require("tmp"));
 	}

@@ -3,7 +3,7 @@ import { readFileSync, tmpFile, watch } from "./fs";
 import { Observable } from "./observable";
 import { basename } from "./path";
 
-const debug = env.debug("vba-blocks:stdout-file");
+const debug = env.debug("vbapm:stdout-file");
 
 export async function createStdoutFile(): Promise<string> {
 	const file = await tmpFile({ dir: env.staging });

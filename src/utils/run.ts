@@ -11,7 +11,7 @@ import { createStdoutFile } from "./stdout-file";
 
 const exec = promisify(_exec);
 
-const debug = env.debug("vba-blocks:run");
+const debug = env.debug("vbapm:run");
 const SPECIAL_FILE_STDOUT = env.isWindows ? "CON" : "/dev/stdout";
 
 export interface RunResult {
@@ -53,7 +53,7 @@ export async function run(
 			dedent`
         Bridge script not found at "${script}".
 
-        This is a fatal error and will require vba-blocks to be re-installed.
+        This is a fatal error and will require vbapm to be re-installed.
       `
 		);
 	}
@@ -117,7 +117,7 @@ export function toResult(stdout: string, stderr: string, err?: Error): RunResult
 
 	if (stdout) {
 		try {
-			// For vba-blocks run, check for standard JSON result
+			// For vbapm run, check for standard JSON result
 			const parsed = JSON.parse(stdout);
 
 			if ("success" in parsed && ("messages" in parsed || "errors" in parsed)) {

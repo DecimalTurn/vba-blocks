@@ -27,7 +27,7 @@ export interface Env {
 	silent: boolean;
 }
 
-const paths = envPaths("vba-blocks", { suffix: "" });
+const paths = envPaths("vbapm", { suffix: "" });
 
 const cache = paths.cache;
 const root = join(__dirname, "../");

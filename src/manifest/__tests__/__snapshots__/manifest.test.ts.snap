@@ -5,7 +5,7 @@ Object {
   "dependencies": Array [
     Object {
       "name": "json",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^2",
     },
   ],
@@ -70,12 +70,12 @@ Object {
   "devDependencies": Array [
     Object {
       "name": "a",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^1.0.0",
     },
     Object {
       "name": "b",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^2.0.0",
     },
     Object {
@@ -187,12 +187,12 @@ Object {
   "dependencies": Array [
     Object {
       "name": "a",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^1.0.0",
     },
     Object {
       "name": "b",
-      "registry": "vba-blocks",
+      "registry": "vbapm",
       "version": "^2.0.0",
     },
     Object {
@@ -399,9 +399,9 @@ Object {
 `;
 
 exports[`throws for invalid syntax 1`] = `
-"vba-blocks.toml is invalid:
+"vba_package.toml is invalid:
 
-Syntax Error: fixtures/projects/invalid-manifest/vba-block.toml (2:4)
+Syntax Error: fixtures/projects/invalid-manifest/vba_package.toml (2:4)
 
 Error parsing TOML (2, 5):
 name: Package Name

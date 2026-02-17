@@ -3,7 +3,7 @@ import { env } from "../env";
 import { pathExists } from "./fs";
 import { join } from "./path";
 
-const debug = env.debug("vba-blocks:git");
+const debug = env.debug("vbapm:git");
 
 interface LoadedGit {
 	git: typeof import("isomorphic-git");

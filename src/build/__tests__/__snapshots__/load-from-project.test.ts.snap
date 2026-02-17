@@ -15,7 +15,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed ...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/dictionary-v1.4.1/Dictionary.cls",
+        "path": ".vbapm/sources/vbapm/dictionary-v1.4.1/Dictionary.cls",
       },
       "filename": "Dictionary.cls",
       "name": "Dictionary",
@@ -89,7 +89,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed ...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/dictionary-v1.4.1/Dictionary.cls",
+        "path": ".vbapm/sources/vbapm/dictionary-v1.4.1/Dictionary.cls",
       },
       "filename": "Dictionary.cls",
       "name": "Dictionary",
@@ -107,7 +107,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_E...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/web-v4.1.5/src/IWebAuthenticator.cls",
+        "path": ".vbapm/sources/vbapm/web-v4.1.5/src/IWebAuthenticator.cls",
       },
       "filename": "IWebAuthenticator.cls",
       "name": "IWebAuthenticator",
@@ -128,7 +128,7 @@ Attribute VB_E...",
 ' @class JsonConverter
 ' @autho...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/json-v2.3.0/JsonConverter.bas",
+        "path": ".vbapm/sources/vbapm/json-v2.3.0/JsonConverter.bas",
       },
       "filename": "JsonConverter.bas",
       "name": "JsonConverter",
@@ -251,7 +251,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed =...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/web-v4.1.5/src/WebClient.cls",
+        "path": ".vbapm/sources/vbapm/web-v4.1.5/src/WebClient.cls",
       },
       "filename": "WebClient.cls",
       "name": "WebClient",
@@ -269,7 +269,7 @@ Attribute VB_Exposed =...",
 ' - Logging
 ' -...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/web-v4.1.5/src/WebHelpers.bas",
+        "path": ".vbapm/sources/vbapm/web-v4.1.5/src/WebHelpers.bas",
       },
       "filename": "WebHelpers.bas",
       "name": "WebHelpers",
@@ -287,7 +287,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed ...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/web-v4.1.5/src/WebRequest.cls",
+        "path": ".vbapm/sources/vbapm/web-v4.1.5/src/WebRequest.cls",
       },
       "filename": "WebRequest.cls",
       "name": "WebRequest",
@@ -305,7 +305,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/web-v4.1.5/src/WebResponse.cls",
+        "path": ".vbapm/sources/vbapm/web-v4.1.5/src/WebResponse.cls",
       },
       "filename": "WebResponse.cls",
       "name": "WebResponse",
@@ -344,7 +344,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed ...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/dictionary-v1.4.1/Dictionary.cls",
+        "path": ".vbapm/sources/vbapm/dictionary-v1.4.1/Dictionary.cls",
       },
       "filename": "Dictionary.cls",
       "name": "Dictionary",
@@ -365,7 +365,7 @@ Attribute VB_Exposed ...",
 ' @class JsonConverter
 ' @autho...",
       "details": Object {
-        "path": ".vba-blocks/sources/vba-blocks/json-v2.3.0/JsonConverter.bas",
+        "path": ".vbapm/sources/vbapm/json-v2.3.0/JsonConverter.bas",
       },
       "filename": "JsonConverter.bas",
       "name": "JsonConverter",
