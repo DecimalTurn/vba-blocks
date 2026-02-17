@@ -19,7 +19,8 @@ jobs:
       - name: Install vba-blocks
         shell: pwsh
         run: |
-          iwr https://vba-blocks.com/install.ps1 | iex
+          $script = (iwr https://vba-blocks.com/install.ps1 -AllowInsecureRedirect).Content
+          iex $script
 
       - name: Verify installation
         shell: pwsh
