@@ -7,7 +7,7 @@ const debug = env.debug("vba-blocks:git");
 
 interface LoadedGit {
 	git: typeof import("isomorphic-git");
-	http: (typeof import("isomorphic-git/http/node"))["default"];
+	http: typeof import("isomorphic-git/http/node")["default"];
 }
 
 async function loadGit(): Promise<LoadedGit> {
