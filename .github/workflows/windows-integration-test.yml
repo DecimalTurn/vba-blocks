@@ -84,6 +84,23 @@ jobs:
         run: |
           vba --version
 
+      # ── Build the vba-blocks addin (needed for import/export COM calls) ──
+      - name: Build vba-blocks addin
+        shell: pwsh
+        run: |
+          npm run build:addins
+
+      - name: Verify addin exists
+        shell: pwsh
+        run: |
+          if (Test-Path "addins/build/vba-blocks.xlam") {
+            Write-Host "Addin built successfully"
+          } else {
+            Write-Error "Addin build failed: vba-blocks.xlam not found"
+            exit 1
+          }
+
+      # ── Empty project: new → build → export ──
       - name: Create a new xlsm project
         shell: pwsh
         run: |
@@ -117,8 +134,80 @@ jobs:
           cd my-project
           vba export
 
+      # ── Roundtrip test: new → add source → build → export → verify ──
+      - name: Create roundtrip project
+        shell: pwsh
+        run: |
+          vba new roundtrip-test.xlsm
+
+      - name: Add a VBA module to the project
+        shell: pwsh
+        run: |
+          $basContent = @"
+          Attribute VB_Name = "MyModule"
+          Public Function Add(a As Long, b As Long) As Long
+              Add = a + b
+          End Function
+          "@
+          # Trim leading spaces from here-string indentation
+          $basContent = ($basContent -split "`n" | ForEach-Object { $_.TrimStart() }) -join "`r`n"
+          [System.IO.File]::WriteAllText("roundtrip-test/src/MyModule.bas", $basContent)
+
+          # Add the source to vba-block.toml
+          Add-Content -Path "roundtrip-test/vba-block.toml" -Value "`n[src]`nMyModule = `"src/MyModule.bas`""
+
+          Write-Host "=== vba-block.toml ==="
+          Get-Content "roundtrip-test/vba-block.toml"
+          Write-Host "`n=== src/MyModule.bas ==="
+          Get-Content "roundtrip-test/src/MyModule.bas"
+
+      - name: Build roundtrip project (imports VBA via COM)
+        shell: pwsh
+        run: |
+          cd roundtrip-test
+          vba build
+
+      - name: Export roundtrip project (extracts VBA via COM)
+        shell: pwsh
+        run: |
+          cd roundtrip-test
+          vba export
+
+      - name: Verify roundtrip - source file preserved
+        shell: pwsh
+        run: |
+          $srcFile = "roundtrip-test/src/MyModule.bas"
+          if (-not (Test-Path $srcFile)) {
+            Write-Error "Roundtrip FAILED: $srcFile not found after export"
+            Get-ChildItem -Recurse roundtrip-test/src -ErrorAction SilentlyContinue
+            exit 1
+          }
+
+          $content = Get-Content $srcFile -Raw
+          if ($content -match "Add = a \+ b") {
+            Write-Host "Roundtrip PASSED: MyModule.bas contains expected function body"
+          } else {
+            Write-Error "Roundtrip FAILED: MyModule.bas does not contain expected content"
+            Write-Host "=== Actual content ==="
+            Get-Content $srcFile
+            exit 1
+          }
+
+          # Verify the module is still referenced in the manifest
+          $toml = Get-Content "roundtrip-test/vba-block.toml" -Raw
+          if ($toml -match 'MyModule') {
+            Write-Host "Roundtrip PASSED: vba-block.toml still references MyModule"
+          } else {
+            Write-Error "Roundtrip FAILED: vba-block.toml lost the MyModule reference"
+            Write-Host "=== vba-block.toml ==="
+            Get-Content "roundtrip-test/vba-block.toml"
+            exit 1
+          }
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: vba-excel-project
-          path: my-project/
+          path: |
+            my-project/
+            roundtrip-test/
