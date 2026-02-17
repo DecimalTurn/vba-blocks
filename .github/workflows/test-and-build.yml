@@ -25,5 +25,7 @@ jobs:
         run: npm run typecheck
       - name: Test
         run: npm test
+      - name: E2E Test
+        run: npm run test:e2e
       - name: Build
         run: npm run build:dev
