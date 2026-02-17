@@ -1,0 +1,50 @@
+name: Windows Integration Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install vba-blocks
+        shell: pwsh
+        run: |
+          iwr https://vba-blocks.com/install.ps1 | iex
+
+      - name: Verify installation
+        shell: pwsh
+        run: |
+          # Refresh PATH so the newly-installed binary is found
+          $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
+          vba --help
+
+      - name: Create a new VBA project
+        shell: pwsh
+        run: |
+          $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
+          mkdir my-project
+          cd my-project
+          vba new my-workbook.xlsm
+
+      - name: Export the project
+        shell: pwsh
+        run: |
+          $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
+          cd my-project/my-workbook
+          vba export
+
+      - name: Upload project artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vba-project
+          path: my-project/my-workbook/
