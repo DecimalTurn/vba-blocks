@@ -113,7 +113,6 @@ jobs:
 
       - name: Export the project
         shell: pwsh
-        continue-on-error: true
         run: |
           cd my-project
           vba export
