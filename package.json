@@ -60,7 +60,6 @@
     "@decimalturn/toml-patch": "^0.7.0",
     "@timhall/ansi-colors": "^5.0.0",
     "@timhall/dedent": "^0.9.1",
-    "archiver": "^3",
     "conf": "^3",
     "date-fns": "^2",
     "debug": "^4",
@@ -79,7 +78,8 @@
     "semver": "^5",
     "tmp": "^0.0",
     "walk-sync": "^1",
-    "xml-js": "^1.6"
+    "xml-js": "^1.6",
+    "yazl": "^3.3.1"
   },
   "devDependencies": {
     "@octokit/core": "^3.1.4",
@@ -89,7 +89,6 @@
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-replace": "^2.3.3",
     "@rollup/plugin-typescript": "^6.0.0",
-    "@types/archiver": "^2",
     "@types/fs-extra": "^5",
     "@types/glob": "^7.2.0",
     "@types/jest": "^23",
