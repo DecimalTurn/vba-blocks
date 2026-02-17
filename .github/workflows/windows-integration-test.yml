@@ -19,7 +19,8 @@ jobs:
       - name: Install vba-blocks
         shell: pwsh
         run: |
-          $script = (iwr https://vba-blocks.com/install.ps1 -AllowInsecureRedirect).Content
+          $response = iwr https://vba-blocks.com/install.ps1 -AllowInsecureRedirect
+          $script = [System.Text.Encoding]::UTF8.GetString($response.Content)
           iex $script
 
       - name: Verify installation
