@@ -2,10 +2,10 @@ name: Windows Integration Test
 
 on:
   push:
-		branches:
+    branches:
       - main
-			- dev
-			- dev-*
+      - dev
+      - dev-*
   pull_request:
   workflow_dispatch:
 
