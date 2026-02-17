@@ -24,11 +24,12 @@ jobs:
           $version = $release.tag_name   # e.g. "v0.5.3"
           Write-Output "Installing vba-blocks $version"
 
-          # Download and run the install script, passing the version so it
-          # skips the COM-based HTML parsing (which doesn't work on CI).
+          # Download the install script and save to a temp file so we can
+          # pass the version as a proper argument (iex doesn't support args).
           $response = iwr "https://vba-blocks.com/install.ps1" -AllowInsecureRedirect
-          $script = [System.Text.Encoding]::UTF8.GetString($response.Content)
-          iex "$script $version"
+          $scriptPath = "$env:TEMP\install-vba-blocks.ps1"
+          [System.IO.File]::WriteAllBytes($scriptPath, $response.Content)
+          & $scriptPath $version
 
       - name: Verify installation
         shell: pwsh
