@@ -38,23 +38,21 @@ jobs:
           $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
           vba --help
 
-      - name: Create a new VBA project
+      - name: Create a new VBA package
         shell: pwsh
         run: |
           $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
-          mkdir my-project
-          cd my-project
-          vba new my-workbook.xlsm
+          # Use --package because the GitHub-hosted runner has no Office/Excel,
+          # so we cannot create a workbook-based project (requires COM/ActiveX).
+          vba new my-package --package
 
-      - name: Export the project
+      - name: Show project structure
         shell: pwsh
         run: |
-          $env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:PATH
-          cd my-project/my-workbook
-          vba export
+          Get-ChildItem -Recurse my-package | Select-Object FullName
 
       - name: Upload project artifact
         uses: actions/upload-artifact@v4
         with:
           name: vba-project
-          path: my-project/my-workbook/
+          path: my-package/
