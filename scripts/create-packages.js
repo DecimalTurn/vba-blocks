@@ -33,9 +33,9 @@ async function mac() {
 
 function getInput(platform) {
 	const ignoreBackup = path => !/\.backup/.test(path);
-	const isVBS = path => /\.vbs/.test(path);
+	const isPowershellScript = path => /\.ps1$/.test(path);
 	const isAppleScript = path => /\.applescript/.test(path);
-	const compatibleRunScript = path => (platform === "win32" ? isVBS(path) : isAppleScript(path));
+	const compatibleRunScript = path => (platform === "win32" ? isPowershellScript(path) : isAppleScript(path));
 	const isCmd = path => /\.cmd/.test(path);
 	const isPowershell = path => /\.ps1/.test(path);
 	const isShell = path => !isCmd(path) && !isPowershell(path);
