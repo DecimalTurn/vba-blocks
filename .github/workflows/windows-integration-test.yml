@@ -19,9 +19,16 @@ jobs:
       - name: Install vba-blocks
         shell: pwsh
         run: |
-          $response = iwr https://vba-blocks.com/install.ps1 -AllowInsecureRedirect
+          # Determine the latest release tag via the GitHub API
+          $release = Invoke-RestMethod "https://api.github.com/repos/vba-blocks/vba-blocks/releases/latest"
+          $version = $release.tag_name   # e.g. "v0.5.3"
+          Write-Output "Installing vba-blocks $version"
+
+          # Download and run the install script, passing the version so it
+          # skips the COM-based HTML parsing (which doesn't work on CI).
+          $response = iwr "https://vba-blocks.com/install.ps1" -AllowInsecureRedirect
           $script = [System.Text.Encoding]::UTF8.GetString($response.Content)
-          iex $script
+          iex "$script $version"
 
       - name: Verify installation
         shell: pwsh
