@@ -1,4 +1,4 @@
-# vba-blocks
+# vbapm
 
 A package manager and build tool for VBA.
 
@@ -7,10 +7,10 @@ A package manager and build tool for VBA.
 Requires [Node.js](https://nodejs.org/) v18 or later.
 
 ```txt
-npm install -g @vbapm/core
+npm install -g vbapm
 ```
 
-**Mac:** For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vba-blocks to work correctly:
+**Mac:** For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vbapm to work correctly:
 
 <details>
   <summary>Trust access to the VBA project object model</summary>
@@ -27,10 +27,10 @@ npm install -g @vbapm/core
 
 ### Programmatic Usage
 
-You can also use `@vbapm/core` as a library (e.g. from a VS Code extension):
+You can also use `vbapm` as a library (e.g. from a VS Code extension):
 
 ```js
-const { buildProject, loadProject, env } = require("@vbapm/core");
+const { buildProject, loadProject, env } = require("vbapm");
 
 // Override working directory
 env.cwd = "/path/to/project";
@@ -43,7 +43,7 @@ await buildProject(project);
 
 ### `new`
 
-Create a new folder with a blank/generated vba-blocks project inside
+Create a new folder with a blank/generated vbapm project inside
 
 Create a folder "project-name" with a blank xlsm project:
 
@@ -71,7 +71,7 @@ vba new json-converter --package
 
 ### `init`
 
-Create a blank/generated vba-blocks project in the current folder
+Create a blank/generated vbapm project in the current folder
 
 Create a blank xlsm project with the current folder's name:
 
