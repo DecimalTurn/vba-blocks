@@ -45,7 +45,7 @@ export async function run(
 	macro: string,
 	args: string[]
 ): Promise<RunResult> {
-	const script = join(env.scripts, env.isWindows ? "run.vbs" : "run.applescript");
+	const script = join(env.scripts, env.isWindows ? "run.ps1" : "run.applescript");
 
 	if (!(await pathExists(script))) {
 		throw new CliError(
@@ -67,7 +67,7 @@ export async function run(
 	});
 	const parts = [application, file, macro, ...formatted_args];
 	const command = env.isWindows
-		? `cscript //Nologo "${script}" ${parts.map(part => `"${part}"`).join(" ")}`
+		? `powershell -NoProfile -ExecutionPolicy Bypass -File "${script}" ${parts.map(part => `"${part}"`).join(" ")}`
 		: `osascript '${script}' ${parts.map(part => `'${part}'`).join(" ")}`;
 
 	debug("params:", { application, file, macro, args });
@@ -98,8 +98,8 @@ export async function run(
 }
 
 export function escape(value: string): string {
-	// Checked DOS escape characters: http://www.robvanderwoude.com/escapechars.php
-	// and only quotes inside of quoted arguments to vbscript seemed to cause issues
+	// Replace quotes with ^q placeholder to avoid issues with shell argument passing.
+	// The PowerShell/AppleScript bridge script unescapes these back to quotes.
 	return value.replace(/\"/g, "^q");
 }
 
