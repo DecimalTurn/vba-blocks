@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Quick smoke test without Office - runs on every push
   smoke-test:
     runs-on: windows-latest
 
@@ -31,13 +32,12 @@ jobs:
       - name: Verify installation
         shell: pwsh
         run: |
+          vba --version
           vba --help
 
       - name: Create a new VBA package
         shell: pwsh
         run: |
-          # Use --package because the GitHub-hosted runner has no Office/Excel,
-          # so we cannot create a workbook-based project (requires COM/ActiveX).
           vba new my-package --package
 
       - name: Show project structure
@@ -48,5 +48,77 @@ jobs:
       - name: Upload project artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vba-project
+          name: vba-package
           path: my-package/
+
+  # Full integration test with Office installed
+  excel-integration:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup VBA runtime
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Install globally from local build
+        shell: pwsh
+        run: |
+          npm install -g .
+
+      - name: Verify installation
+        shell: pwsh
+        run: |
+          vba --version
+
+      - name: Create a new xlsm project
+        shell: pwsh
+        run: |
+          vba new my-project.xlsm
+
+      - name: Show project structure
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse my-project | Select-Object FullName
+
+      - name: Build the project
+        shell: pwsh
+        run: |
+          cd my-project
+          vba build
+
+      - name: Verify build output exists
+        shell: pwsh
+        run: |
+          if (Test-Path "my-project/build/my-project.xlsm") {
+            Write-Host "Build succeeded: my-project.xlsm exists"
+          } else {
+            Write-Error "Build failed: my-project.xlsm not found"
+            Get-ChildItem -Recurse my-project/build -ErrorAction SilentlyContinue | Select-Object FullName
+            exit 1
+          }
+
+      - name: Export the project
+        shell: pwsh
+        run: |
+          cd my-project
+          vba export
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vba-excel-project
+          path: my-project/
