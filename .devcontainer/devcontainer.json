@@ -1,0 +1,25 @@
+{
+  "name": "PowerShell Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "pwsh -Command \"Write-Host 'PowerShell ready!'\"",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.powershell",
+        "ms-azuretools.vscode-docker",
+        "NotisDataAnalytics.vba-lsp",
+        "GitHub.copilot-chat",
+        "ms-azuretools.vscode-containers",
+        "github.vscode-github-actions"
+      ],
+      "settings": {
+        "extensions.experimental.preferPreReleases": {
+          "NotisDataAnalytics.vba-lsp": true
+        }
+      }
+    }
+  }
+}
