@@ -1,5 +1,5 @@
 {
-	"name": "@vbapm/core",
+	"name": "vbapm",
 	"version": "0.6.0-alpha",
 	"description": "A package manager and build tool for VBA",
 	"contributors": [
@@ -11,9 +11,6 @@
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/vbapm/core.git"
-	},
-	"publishConfig": {
-		"access": "public"
 	},
 	"engines": {
 		"node": ">=18.0.0"
