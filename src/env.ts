@@ -15,6 +15,7 @@ export interface Env {
 	temp: string;
 
 	addins: string;
+	templates: string;
 	scripts: string;
 	registry: string;
 	packages: string;
@@ -38,6 +39,7 @@ export const env: Env = {
 
 	...paths, // data, config, cache, log, temp
 	addins: join(root, "addins/build"),
+	templates: join(root, "templates"),
 	scripts: join(root, "run-scripts"),
 	registry: join(cache, "registry"),
 	packages: join(cache, "packages"),

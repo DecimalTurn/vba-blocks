@@ -117,6 +117,12 @@ export async function importTarget(
 	const build_graph = await loadFromProject(project, dependencies, options);
 	const import_graph = await stageBuildGraph(build_graph, staging);
 
+	// Skip the COM/addin call when there is nothing to import
+	// (e.g. a brand-new project with no src or references).
+	if (import_graph.components.length === 0 && import_graph.references.length === 0) {
+		return;
+	}
+
 	try {
 		await importGraph(project, target, import_graph, file, options);
 	} catch (err) {

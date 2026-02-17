@@ -6,6 +6,7 @@ import { Project } from "./project";
 import { copy, ensureDir, pathExists } from "./utils/fs";
 import { dirname, join } from "./utils/path";
 import { run } from "./utils/run";
+import { zip } from "./utils/zip";
 
 export type Application = "excel";
 export type Addin = string;
@@ -83,16 +84,29 @@ export async function exportTo(
 }
 
 /**
- * Create a new document at the given path
+ * Create a new document at the given path.
+ *
+ * Uses a bundled OOXML template when available so that Excel/COM is not
+ * required just to produce a blank workbook.  Falls back to the COM
+ * addin path for target types that have no template.
  */
 export async function createDocument(
 	project: Project,
 	target: Target,
 	options: AddinOptions = {}
 ): Promise<string> {
-	const { application, addin, file } = getTargetInfo(project, target, options);
+	const { file } = getTargetInfo(project, target, options);
 
-	// For Mac, stage target to avoid permission prompts and then copy to build directory
+	// Try template-based creation first (no COM / no addin needed)
+	const templateDir = join(env.templates, target.type);
+	if (await pathExists(templateDir)) {
+		await ensureDir(dirname(file));
+		await zip(templateDir, file);
+		return file;
+	}
+
+	// Fallback: use COM via the addin
+	const { application, addin } = getTargetInfo(project, target);
 	const useStaging = !env.isWindows && !options.staging;
 	let path = !useStaging ? file : join(project.paths.staging, target.filename);
 
@@ -103,7 +117,6 @@ export async function createDocument(
 		})
 	]);
 
-	// For Mac, then copy staged to build directory
 	if (useStaging) {
 		await ensureDir(dirname(file));
 		await copy(path, file);
