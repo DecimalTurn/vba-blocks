@@ -120,8 +120,12 @@ test("should fetch from git using sources", async () => {
 
 test("should throw on unknown type", async () => {
 	const sources = getSources();
-	await expect(resolve(sources, unknownDependency)).rejects.toMatchSnapshot();
-	await expect(fetch(sources, unknownRegistration)).rejects.toMatchSnapshot();
+	await expect(resolve(sources, unknownDependency)).rejects.toThrow(
+		'No matching registry configured for "unknown-registry".'
+	);
+	await expect(fetch(sources, unknownRegistration)).rejects.toThrow(
+		'No matching registry configured for "unknown-registry".'
+	);
 });
 
 function getSources() {

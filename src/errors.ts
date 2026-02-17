@@ -1,6 +1,5 @@
 import dedent from "@timhall/dedent";
 import { dim } from "@timhall/ansi-colors";
-import { ok } from "assert";
 import { has } from "./utils/has";
 import { isString } from "./utils/is";
 
@@ -84,7 +83,7 @@ export function manifestOk(value: any, message: string) {
     `
 	);
 
-	ok(value, error);
+	if (!value) throw error;
 }
 
 // Utils

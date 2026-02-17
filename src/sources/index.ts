@@ -1,5 +1,4 @@
 import dedent from "@timhall/dedent";
-import { ok } from "assert";
 import { CliError, ErrorCode } from "../errors";
 import {
 	Dependency,
@@ -25,7 +24,7 @@ export async function resolve(sources: Sources, dependency: Dependency): Promise
 	if (isRegistryDependency(dependency)) {
 		const { registry } = dependency;
 		const source = sources.registry[registry];
-		ok(source, sourceMisconfiguredRegistry(registry));
+		if (!source) throw sourceMisconfiguredRegistry(registry);
 
 		return source.resolve(dependency);
 	} else if (isPathDependency(dependency)) {
@@ -45,7 +44,7 @@ export async function fetch(sources: Sources, registration: Registration): Promi
 
 	if (type === "registry") {
 		const source = sources.registry[value];
-		ok(source, sourceMisconfiguredRegistry(value));
+		if (!source) throw sourceMisconfiguredRegistry(value);
 
 		return sources.registry[value].fetch(registration);
 	} else if (type === "path") {
