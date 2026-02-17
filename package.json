@@ -1,10 +1,20 @@
 {
 	"name": "@vbapm/core",
-	"version": "0.6.0",
+	"version": "0.6.0-alpha",
 	"description": "A package manager and build tool for VBA",
-	"repository": "https://github.com/vbapm/core.git",
-	"author": "Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)",
+	"contributors": [
+		"Tim Hall <tim.hall.engr@gmail.com>",
+		"Martin Leduc <31558169+DecimalTurn@users.noreply.github.com>"
+	],
 	"license": "MIT",
+	"homepage": "https://github.com/vbapm/core",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/vbapm/core.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"engines": {
 		"node": ">=18.0.0"
 	},
