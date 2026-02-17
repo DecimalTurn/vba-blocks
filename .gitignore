@@ -1,6 +1,7 @@
 /lib
 /dist
 /tests/.tmp
+/tests/**/*.d.ts
 /addins/build
 /addins/**/build
 /vendor

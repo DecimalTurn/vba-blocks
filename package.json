@@ -13,11 +13,11 @@
 		"vba": "lib/vba-blocks.js"
 	},
 	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
+	"types": "lib/src/index.d.ts",
 	"exports": {
 		".": {
 			"require": "./lib/index.js",
-			"types": "./lib/index.d.ts"
+			"types": "./lib/src/index.d.ts"
 		}
 	},
 	"files": [
