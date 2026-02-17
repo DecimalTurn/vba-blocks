@@ -45,6 +45,34 @@ jobs:
         run: |
           Get-ChildItem -Recurse my-package | Select-Object FullName
 
+      - name: Test vba init (package mode)
+        shell: pwsh
+        run: |
+          mkdir init-test
+          cd init-test
+          vba init --package --name my-library --no-git
+
+          if (-not (Test-Path "vba-block.toml")) {
+            Write-Error "vba init FAILED: vba-block.toml not found"
+            exit 1
+          }
+
+          $toml = Get-Content "vba-block.toml" -Raw
+          if ($toml -match 'name = "my-library"') {
+            Write-Host "vba init PASSED: project name set correctly"
+          } else {
+            Write-Error "vba init FAILED: unexpected toml content"
+            Write-Host $toml
+            exit 1
+          }
+
+          if (Test-Path "src") {
+            Write-Host "vba init PASSED: src/ directory created"
+          } else {
+            Write-Error "vba init FAILED: src/ directory not found"
+            exit 1
+          }
+
       - name: Upload project artifact
         uses: actions/upload-artifact@v4
         with:
