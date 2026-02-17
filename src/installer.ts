@@ -1,11 +1,13 @@
 import { differenceInCalendarDays } from "date-fns";
 import { gt as semverGreaterThan } from "semver";
+import fetch from "node-fetch";
 import { version as currentVersion } from "../package.json";
 import { cache } from "./cache";
 import { env } from "./env";
-import { getLatestRelease } from "./utils/github";
 
 const debug = env.debug("vba-blocks:installer");
+
+const NPM_PACKAGE_NAME = "@vbapm/core";
 
 export function updateVersion(): string | undefined {
 	return cache.latest_version;
@@ -32,15 +34,14 @@ export async function checkForUpdate(): Promise<boolean> {
 	cache.latest_version_checked = Date.now();
 
 	try {
-		const { tag_name: latestVersion } = await getLatestRelease({
-			owner: "vba-blocks",
-			repo: "vba-blocks"
-		});
+		const response = await fetch(`https://registry.npmjs.org/${NPM_PACKAGE_NAME}/latest`);
+		const data: any = await response.json();
+		const latestVersion: string = data.version;
 		cache.latest_version = latestVersion;
 
 		return semverGreaterThan(latestVersion, currentVersion);
 	} catch (error) {
-		debug("Error loading latest release");
+		debug("Error loading latest version from npm registry");
 		debug(error);
 		return false;
 	}

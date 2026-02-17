@@ -68,7 +68,7 @@ const updateAvailableMessage = () => dedent`
   \n${greenBright("New Update!")} ${updateVersion()!}
 
   A new version of vba-blocks is available.
-  Visit https://vba-blocks.com/update for more information.`;
+  Run "npm update -g @vbapm/core" to update.`;
 
 process.title = "vba-blocks";
 process.on("unhandledRejection", handleError);

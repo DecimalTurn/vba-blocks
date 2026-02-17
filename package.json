@@ -1,26 +1,43 @@
 {
-	"name": "vba-blocks",
-	"version": "0.5.3",
-	"repository": "https://github.com/vba-blocks/vba-blocks.git",
+	"name": "@vbapm/core",
+	"version": "0.6.0",
+	"description": "A package manager and build tool for VBA",
+	"repository": "https://github.com/vbapm/core.git",
 	"author": "Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)",
 	"license": "MIT",
 	"engines": {
-		"node": ">=12.19.0"
+		"node": ">=18.0.0"
 	},
-	"bin": "src/vba-blocks.js",
-	"main": "src/index.js",
+	"bin": {
+		"vba-blocks": "lib/vba-blocks.js",
+		"vba": "lib/vba-blocks.js"
+	},
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./lib/index.js",
+			"types": "./lib/index.d.ts"
+		}
+	},
+	"files": [
+		"lib/",
+		"addins/build/",
+		"run-scripts/",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
 		"format": "prettier --write \"**/*.{ts,js}\"",
 		"test": "jest --runInBand",
 		"typecheck": "tsc",
 		"test:e2e": "jest --config e2e.config.js --runInBand",
-		"build": "rimraf lib && rollup -c && node scripts/ensure-vendor",
+		"build": "rimraf lib && rollup -c && tsc -p tsconfig.build.json",
 		"build:dev": "cross-env NODE_ENV=development rollup -c",
 		"build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
 		"build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vba-blocks build",
-		"version": "npm run build && npm run build:addins && node scripts/ensure-vendor && node scripts/create-packages",
+		"prepublishOnly": "npm run build",
 		"postversion": "git push && git push --tags",
-		"release": "node scripts/release",
 		"clean": "rimraf lib && rimraf dist && rimraf addins/build"
 	},
 	"jest": {

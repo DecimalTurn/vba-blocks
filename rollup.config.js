@@ -8,6 +8,33 @@ import typescript from "@rollup/plugin-typescript";
 
 const mode = process.env.NODE_ENV || "production";
 
+// Plugin to add shebang to CLI entry point and make it executable
+function shebang() {
+	return {
+		name: "shebang",
+		renderChunk(code, chunk) {
+			if (chunk.facadeModuleId && chunk.facadeModuleId.includes("vba-blocks.ts")) {
+				return "#!/usr/bin/env node\n" + code;
+			}
+			return null;
+		},
+		writeBundle(options, bundle) {
+			const fs = require("fs");
+			const path = require("path");
+			for (const [fileName] of Object.entries(bundle)) {
+				if (fileName === "vba-blocks.js") {
+					const filePath = path.resolve(options.dir, fileName);
+					try {
+						fs.chmodSync(filePath, 0o755);
+					} catch (e) {
+						// Ignore chmod errors on Windows
+					}
+				}
+			}
+		}
+	};
+}
+
 export default [
 	{
 		input: ["src/index.ts", "src/bin/vba-blocks.ts", "src/debug.ts"],
@@ -33,7 +60,8 @@ export default [
 			mode === "production" && terser(),
 			readableStream(),
 			debug(),
-			workerThreads()
+			workerThreads(),
+			shebang()
 		].filter(Boolean),
 		onwarn(warning, warn) {
 			// Ignore known errors
