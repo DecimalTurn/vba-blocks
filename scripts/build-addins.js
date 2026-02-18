@@ -3,6 +3,8 @@ const vba = require("../lib/index");
 
 main().catch(err => {
 	console.error(err.message);
+	if (err.stack) console.error(err.stack);
+	if (err.underlying && err.underlying.stack) console.error(err.underlying.stack);
 	console.log(err.underlying && err.underlying.result);
 	process.exit(1);
 });
