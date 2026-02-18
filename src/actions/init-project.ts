@@ -67,7 +67,7 @@ export async function initProject(options: InitOptions) {
 		if (!(await pathExists(starterModule))) {
 			await writeFile(
 				starterModule,
-				"Attribute VB_Name = \"Module1\"\r\nOption Explicit\r\n\r\nPublic Sub HelloWorld()\r\n    Debug.Print \"Hello, World!\"\r\nEnd Sub\r\n"
+				'Attribute VB_Name = "Module1"\r\nOption Explicit\r\n\r\nPublic Sub HelloWorld()\r\n    Debug.Print "Hello, World!"\r\nEnd Sub\r\n'
 			);
 		}
 	}
