@@ -133,7 +133,16 @@ export function parseManifest(value: any, dir: string): Manifest {
 }
 
 export async function loadManifest(dir: string): Promise<Manifest> {
-	const file = join(dir, "vba_package.toml");
+	let file = join(dir, "vba_package.toml");
+
+	// Fall back to legacy manifest name for backward compatibility
+	// (e.g. registry packages that still use the old filename)
+	if (!(await pathExists(file))) {
+		const legacy = join(dir, "vba-block.toml");
+		if (await pathExists(legacy)) {
+			file = legacy;
+		}
+	}
 
 	if (!(await pathExists(file))) {
 		throw new CliError(
