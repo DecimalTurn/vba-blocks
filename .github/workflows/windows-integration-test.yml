@@ -118,34 +118,6 @@ jobs:
         run: |
           vba --version
 
-      # ── Empty project: new → build (no addin needed for empty projects) ──
-      - name: Create a new xlsm project
-        shell: pwsh
-        run: |
-          vba new my-project.xlsm
-
-      - name: Show project structure
-        shell: pwsh
-        run: |
-          Get-ChildItem -Recurse my-project | Select-Object FullName
-
-      - name: Build the empty project
-        shell: pwsh
-        run: |
-          cd my-project
-          vba build
-
-      - name: Verify build output exists
-        shell: pwsh
-        run: |
-          if (Test-Path "my-project/build/my-project.xlsm") {
-            Write-Host "Build succeeded: my-project.xlsm exists"
-          } else {
-            Write-Error "Build failed: my-project.xlsm not found"
-            Get-ChildItem -Recurse my-project/build -ErrorAction SilentlyContinue | Select-Object FullName
-            exit 1
-          }
-
       # ── Build the vbapm addin (needed for import/export COM calls) ──
       - name: Build vbapm addin
         id: build-addin
@@ -161,12 +133,44 @@ jobs:
             Write-Host "Addin built successfully"
             echo "ADDIN_AVAILABLE=true" >> $env:GITHUB_ENV
           } else {
-            Write-Host "::warning::Addin build failed - export and roundtrip tests will be skipped"
+            Write-Host "::warning::Addin build failed - project build, export and roundtrip tests will be skipped"
             echo "ADDIN_AVAILABLE=false" >> $env:GITHUB_ENV
           }
 
-      # ── Export empty project (needs addin) ──
-      - name: Export the empty project
+      # ── New project: new → build (needs addin since project has starter module) ──
+      - name: Create a new xlsm project
+        if: env.ADDIN_AVAILABLE == 'true'
+        shell: pwsh
+        run: |
+          vba new my-project.xlsm
+
+      - name: Show project structure
+        if: env.ADDIN_AVAILABLE == 'true'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse my-project | Select-Object FullName
+
+      - name: Build the project
+        if: env.ADDIN_AVAILABLE == 'true'
+        shell: pwsh
+        run: |
+          cd my-project
+          vba build
+
+      - name: Verify build output exists
+        if: env.ADDIN_AVAILABLE == 'true'
+        shell: pwsh
+        run: |
+          if (Test-Path "my-project/build/my-project.xlsm") {
+            Write-Host "Build succeeded: my-project.xlsm exists"
+          } else {
+            Write-Error "Build failed: my-project.xlsm not found"
+            Get-ChildItem -Recurse my-project/build -ErrorAction SilentlyContinue | Select-Object FullName
+            exit 1
+          }
+
+      # ── Export project (needs addin) ──
+      - name: Export the project
         if: env.ADDIN_AVAILABLE == 'true'
         shell: pwsh
         run: |
