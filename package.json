@@ -39,6 +39,7 @@
 		"editorconfig": "^0.15.3",
 		"env-paths": "^2",
 		"fs-extra": "^7",
+		"glob": "^7.2.3",
 		"isomorphic-git": "^1.8.2",
 		"logic-solver": "^2",
 		"meant": "^1.0",

@@ -17,7 +17,7 @@ export default [
 			sourcemap: true,
 			exports: "auto"
 		},
-		external: [...builtin],
+		external: [...builtin, "glob"],
 		plugins: [
 			resolve(),
 			replace({
