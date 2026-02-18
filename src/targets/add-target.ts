@@ -67,7 +67,10 @@ export async function addTarget(type: TargetType, info: ProjectInfo, options: Ad
 			await remove(target.path);
 			await copy(extracted, target.path);
 
-			await buildTarget(target, info);
+			// Build the target (creates the .xlsm in build/).
+			// Only the blank document is created here; VBA source import
+			// is deferred to `vba build` since the addin may not be available yet.
+			await buildTarget(target, info, { skipImport: true });
 		}
 
 		await writeManifest(project.manifest, project.paths.dir);

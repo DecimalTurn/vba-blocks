@@ -14,6 +14,7 @@ export interface BuildOptions {
 	release?: boolean;
 	target?: string;
 	addin?: string;
+	skipImport?: boolean;
 }
 
 const isCreateDocumentError = (message: string) => /1004/.test(message);
@@ -50,7 +51,9 @@ export async function buildTarget(target: Target, info: ProjectInfo, options: Bu
 		throw new CliError(ErrorCode.TargetIsOpen, targetIsOpen(target, file));
 	}
 
-	await importTarget(target, info, staged, options);
+	if (!options.skipImport) {
+		await importTarget(target, info, staged, options);
+	}
 
 	// Backup and move from staging to build directory
 	try {
