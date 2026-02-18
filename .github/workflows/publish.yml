@@ -50,8 +50,6 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --provenance --tag ${{ steps.npm-tag.outputs.tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Check git status
         run: git status && git diff
