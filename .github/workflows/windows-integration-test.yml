@@ -155,58 +155,58 @@ jobs:
         run: |
           Write-Host "=== Testing Excel COM automation ==="
 
-          # Test 1: Can we create an Excel instance?
-          try {
-            $excel = New-Object -ComObject "Excel.Application"
-            $excel.Visible = $false
-            $excel.DisplayAlerts = $false
-            Write-Host "PASS: Excel COM object created (Version: $($excel.Version))"
-          } catch {
-            Write-Host "FAIL: Cannot create Excel COM object: $($_.Exception.Message)"
-            exit 0
-          }
+          # Test 1: Direct PS7 COM test
+          $excel = New-Object -ComObject "Excel.Application"
+          $excel.Visible = $false
+          $excel.DisplayAlerts = $false
+          Write-Host "PASS: Excel COM (Version: $($excel.Version))"
 
-          # Test 2: Can we open the bootstrap workbook?
           $bootstrapPath = "${{ github.workspace }}\scripts\bootstrap\build\bootstrap.xlsm"
-          Write-Host "Opening: $bootstrapPath"
-          try {
-            $wb = $excel.Workbooks.Open($bootstrapPath)
-            Write-Host "PASS: bootstrap.xlsm opened"
-          } catch {
-            Write-Host "FAIL: Cannot open bootstrap.xlsm: $($_.Exception.Message)"
-            $excel.Quit()
-            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
-            exit 0
-          }
+          $wb = $excel.Workbooks.Open($bootstrapPath)
+          Write-Host "PASS: bootstrap.xlsm opened"
 
-          # Test 3: Can we access VBProject?
-          try {
-            $vbp = $wb.VBProject
-            Write-Host "PASS: VBProject accessible (Name: $($vbp.Name))"
-            $componentCount = $vbp.VBComponents.Count
-            Write-Host "  Components: $componentCount"
-            foreach ($comp in $vbp.VBComponents) {
-              Write-Host "  - $($comp.Name) (Type: $($comp.Type))"
-            }
-          } catch {
-            Write-Host "FAIL: Cannot access VBProject: $($_.Exception.Message)"
-          }
+          $vbp = $wb.VBProject
+          Write-Host "PASS: VBProject accessible ($($vbp.VBComponents.Count) components)"
 
-          # Test 4: Can we call Application.Run with a simple test?
-          try {
-            # Try calling a macro that doesn't exist to see the error type
-            $result = $excel.Run("Build.ImportGraph", "test")
-            Write-Host "PASS: Application.Run returned: $result"
-          } catch {
-            Write-Host "Application.Run error: $($_.Exception.Message)"
-            Write-Host "HRESULT: $($_.Exception.HResult)"
-            Write-Host "InnerException: $($_.Exception.InnerException)"
-          }
+          $result = $excel.Run("Build.ImportGraph", "test")
+          Write-Host "PASS (PS7 direct): $result"
 
-          # Cleanup
           $wb.Close($false)
           $excel.Quit()
           [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+          Start-Sleep -Seconds 2
+
+          # Test 2: Call run.ps1 via powershell.exe (PS5) — same as Node.js does
+          $script = "${{ github.workspace }}\run-scripts\run.ps1"
+          Write-Host "--- Testing via PS5 (powershell.exe -File run.ps1) ---"
+          $testArgs = @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", $script,
+            "excel",
+            "$bootstrapPath",
+            "Build.ImportGraph",
+            "{^qfile^q:^qtest.xlsm^q,^qname^q:^qVBAProject^q,^qsrc^q:[],^qreferences^q:[]}"
+          )
+          Write-Host "Command: powershell.exe $($testArgs -join ' ')"
+          try {
+            $ps5result = & powershell.exe @testArgs 2>&1
+            Write-Host "PS5 result: $ps5result"
+          } catch {
+            Write-Host "PS5 error: $($_.Exception.Message)"
+          }
+
+          # Test 3: Call run.ps1 via cmd.exe — exactly as child_process.exec does
+          Write-Host "--- Testing via cmd.exe (same as Node child_process.exec) ---"
+          $cmdString = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $script + '" "excel" "' + $bootstrapPath + '" "Build.ImportGraph" "{^qfile^q:^qtest.xlsm^q,^qname^q:^qVBAProject^q,^qsrc^q:[],^qreferences^q:[]}"'
+          Write-Host "CMD command: $cmdString"
+          try {
+            $cmdResult = & cmd.exe /c $cmdString 2>&1
+            Write-Host "CMD result: $cmdResult"
+          } catch {
+            Write-Host "CMD error: $($_.Exception.Message)"
+          }
+
           Write-Host "=== Diagnostics complete ==="
 
       # ── Build the vbapm addin (needed for import/export COM calls) ──
