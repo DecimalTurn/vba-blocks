@@ -11,7 +11,7 @@ import { Version } from "./version";
 
   - registry: version | { version, registry? }
 
-    Registry (default = "vbapm"):
+    Registry (default = "vba-blocks"):
     index + packages are loading in config and used for resolve and fetching
 
   - path: path
@@ -66,7 +66,7 @@ export function parseDependency(name: string, value: Version | any, dir: string)
 	if (isString(value)) value = { version: value };
 
 	let {
-		registry = "vbapm",
+		registry = "vba-blocks",
 		version,
 		path,
 		git,
@@ -118,7 +118,7 @@ export function formatDependencies(dependencies: Dependency[], dir: string): obj
 	dependencies.forEach(dependency => {
 		if (isRegistryDependency(dependency)) {
 			const { name, registry, version } = dependency;
-			value[name] = registry !== "vbapm" ? { version, registry } : version;
+			value[name] = registry !== "vba-blocks" ? { version, registry } : version;
 		} else if (isPathDependency(dependency)) {
 			let { name, path } = dependency;
 			path = relative(dir, path);

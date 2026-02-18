@@ -1,7 +1,7 @@
 const { promisify } = require("util");
 const execFile = promisify(require("child_process").execFile);
 
-const remote = "https://github.com/vbapm/registry.git";
+const remote = "https://github.com/vba-blocks/registry.git";
 
 module.exports = {
 	async pull({ dir }) {

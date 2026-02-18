@@ -30,7 +30,7 @@ Array [
     "dependencies": Array [],
     "id": "b@1.0.0",
     "name": "b",
-    "source": "registry+vbapm#<hash>",
+    "source": "registry+vba-blocks#<hash>",
     "version": "1.0.0",
   },
 ]

@@ -17,7 +17,7 @@ const gitRegistration: Registration = {
 const registryDependency: RegistryDependency = {
 	name: "b",
 	version: "1.0.0",
-	registry: "vbapm"
+	registry: "vba-blocks"
 };
 const registryRegistration: Registration = {
 	id: "b@1.0.0",
@@ -56,7 +56,7 @@ test("should resolve from registry using sources", async () => {
 	const sources = getSources();
 	const registered = await resolve(sources, registryDependency);
 
-	expect(getMock(sources.registry["vbapm"].resolve).calls.length).toEqual(1);
+	expect(getMock(sources.registry["vba-blocks"].resolve).calls.length).toEqual(1);
 	expect(getMock(sources.path.resolve).calls.length).toEqual(0);
 	expect(getMock(sources.git.resolve).calls.length).toEqual(0);
 
@@ -67,7 +67,7 @@ test("should resolve from path using sources", async () => {
 	const sources = getSources();
 	const registered = await resolve(sources, pathDependency);
 
-	expect(getMock(sources.registry["vbapm"].resolve).calls.length).toEqual(0);
+	expect(getMock(sources.registry["vba-blocks"].resolve).calls.length).toEqual(0);
 	expect(getMock(sources.path.resolve).calls.length).toEqual(1);
 	expect(getMock(sources.git.resolve).calls.length).toEqual(0);
 
@@ -78,7 +78,7 @@ test("should resolve from git using sources", async () => {
 	const sources = getSources();
 	const registered = await resolve(sources, gitDependency);
 
-	expect(getMock(sources.registry["vbapm"].resolve).calls.length).toEqual(0);
+	expect(getMock(sources.registry["vba-blocks"].resolve).calls.length).toEqual(0);
 	expect(getMock(sources.path.resolve).calls.length).toEqual(0);
 	expect(getMock(sources.git.resolve).calls.length).toEqual(1);
 
@@ -89,7 +89,7 @@ test("should fetch from registry using sources", async () => {
 	const sources = getSources();
 	const path = await fetch(sources, registryRegistration);
 
-	expect(getMock(sources.registry["vbapm"].fetch).calls.length).toEqual(1);
+	expect(getMock(sources.registry["vba-blocks"].fetch).calls.length).toEqual(1);
 	expect(getMock(sources.path.fetch).calls.length).toEqual(0);
 	expect(getMock(sources.git.fetch).calls.length).toEqual(0);
 
@@ -100,7 +100,7 @@ test("should fetch from path using sources", async () => {
 	const sources = getSources();
 	const path = await fetch(sources, pathRegistration);
 
-	expect(getMock(sources.registry["vbapm"].fetch).calls.length).toEqual(0);
+	expect(getMock(sources.registry["vba-blocks"].fetch).calls.length).toEqual(0);
 	expect(getMock(sources.path.fetch).calls.length).toEqual(1);
 	expect(getMock(sources.git.fetch).calls.length).toEqual(0);
 
@@ -111,7 +111,7 @@ test("should fetch from git using sources", async () => {
 	const sources = getSources();
 	const path = await fetch(sources, gitRegistration);
 
-	expect(getMock(sources.registry["vbapm"].fetch).calls.length).toEqual(0);
+	expect(getMock(sources.registry["vba-blocks"].fetch).calls.length).toEqual(0);
 	expect(getMock(sources.path.fetch).calls.length).toEqual(0);
 	expect(getMock(sources.git.fetch).calls.length).toEqual(1);
 
@@ -131,7 +131,7 @@ test("should throw on unknown type", async () => {
 function getSources() {
 	const sources: Sources = {
 		registry: {
-			vbapm: {
+			"vba-blocks": {
 				resolve: jest.fn(_dependency => [registryRegistration]),
 				fetch: jest.fn(_registration => "registry path")
 			}

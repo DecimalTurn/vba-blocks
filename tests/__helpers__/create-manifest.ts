@@ -43,7 +43,7 @@ function toDependencies(values: any): Dependency[] {
 		dependencies.push({
 			name,
 			version: <string>version,
-			registry: "vbapm"
+			registry: "vba-blocks"
 		});
 	}
 
