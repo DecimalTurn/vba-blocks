@@ -2,13 +2,15 @@ import { homedir } from "os";
 import { ensureDirSync } from "./fs";
 import { join } from "./path";
 
-export function getStaging(cache: string): string {
-	const staging =
-		process.platform === "win32"
-			? join(cache, "staging")
-			: join(findMacOfficeContainer(), ".vba-blocks");
-	ensureDirSync(staging);
 
+export function getStaging(cache: string): string {
+	let staging: string;
+	if (process.platform === "darwin") {
+		staging = join(findMacOfficeContainer(), ".vba-blocks");
+	} else {
+		staging = join(cache, "staging");
+	}
+	ensureDirSync(staging);
 	return staging;
 }
 
