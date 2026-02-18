@@ -122,6 +122,11 @@ export async function initProject(
 
 	// Manually generate manifest and project
 	// (may be included in project in the future)
+	// Include starter module for projects (not packages)
+	const src = type === "project"
+		? [{ name: "Module1", path: join(dir, "src", "Module1.bas") }]
+		: [];
+
 	const manifest: Manifest = {
 		type,
 		name,
@@ -130,7 +135,7 @@ export async function initProject(
 			authors,
 			license
 		},
-		src: [],
+		src,
 		dependencies: [],
 		references: [],
 		devSrc: [],

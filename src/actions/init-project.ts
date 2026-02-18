@@ -61,6 +61,17 @@ export async function initProject(options: InitOptions) {
 
 	await ensureDir(join(dir, "src"));
 
+	// Scaffold a starter module for projects (not packages)
+	if (!asPackage && !from) {
+		const starterModule = join(dir, "src", "Module1.bas");
+		if (!(await pathExists(starterModule))) {
+			await writeFile(
+				starterModule,
+				"Attribute VB_Name = \"Module1\"\r\nOption Explicit\r\n\r\nPublic Sub HelloWorld()\r\n    Debug.Print \"Hello, World!\"\r\nEnd Sub\r\n"
+			);
+		}
+	}
+
 	if (git && !(await pathExists(join(dir, ".git")))) {
 		await git_init(dir);
 		await writeFile(join(dir, ".gitignore"), `/build`);
