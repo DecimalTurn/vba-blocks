@@ -98,6 +98,36 @@ jobs:
         with:
           office-apps: Excel
 
+      - name: Configure Excel trust settings
+        shell: pwsh
+        run: |
+          # Disable Protected View for all sources (prevents blocking COM automation)
+          $pvPath = "HKCU:\Software\Microsoft\Office\16.0\Excel\Security\ProtectedView"
+          if (-not (Test-Path $pvPath)) { New-Item -Path $pvPath -Force | Out-Null }
+          Set-ItemProperty -Path $pvPath -Name "DisableInternetFilesInPV" -Value 1 -Type DWord
+          Set-ItemProperty -Path $pvPath -Name "DisableAttachementsInPV" -Value 1 -Type DWord
+          Set-ItemProperty -Path $pvPath -Name "DisableUnsafeLocationsInPV" -Value 1 -Type DWord
+
+          # Add workspace as a trusted location so macros can run from it
+          $tlPath = "HKCU:\Software\Microsoft\Office\16.0\Excel\Security\Trusted Locations\Location99"
+          if (-not (Test-Path $tlPath)) { New-Item -Path $tlPath -Force | Out-Null }
+          Set-ItemProperty -Path $tlPath -Name "Path" -Value "${{ github.workspace }}\" -Type String
+          Set-ItemProperty -Path $tlPath -Name "AllowSubFolders" -Value 1 -Type DWord
+
+          # Also trust the temp directory (staging files go there)
+          $tlPath2 = "HKCU:\Software\Microsoft\Office\16.0\Excel\Security\Trusted Locations\Location98"
+          if (-not (Test-Path $tlPath2)) { New-Item -Path $tlPath2 -Force | Out-Null }
+          Set-ItemProperty -Path $tlPath2 -Name "Path" -Value "$env:LOCALAPPDATA\vbapm\" -Type String
+          Set-ItemProperty -Path $tlPath2 -Name "AllowSubFolders" -Value 1 -Type DWord
+
+          # Trust the system temp directory too
+          $tlPath3 = "HKCU:\Software\Microsoft\Office\16.0\Excel\Security\Trusted Locations\Location97"
+          if (-not (Test-Path $tlPath3)) { New-Item -Path $tlPath3 -Force | Out-Null }
+          Set-ItemProperty -Path $tlPath3 -Name "Path" -Value "$env:TEMP\" -Type String
+          Set-ItemProperty -Path $tlPath3 -Name "AllowSubFolders" -Value 1 -Type DWord
+
+          Write-Host "Excel trust settings configured"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
