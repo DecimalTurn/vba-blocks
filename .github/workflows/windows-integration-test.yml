@@ -6,6 +6,8 @@ on:
       - main
       - dev
       - dev-*
+    paths-ignore:
+      - '**/*.md'
   pull_request:
   workflow_dispatch:
 
