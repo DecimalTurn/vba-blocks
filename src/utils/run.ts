@@ -67,7 +67,7 @@ export async function run(
 	});
 	const parts = [application, file, macro, ...formatted_args];
 	const command = env.isWindows
-		? `powershell -NoProfile -ExecutionPolicy Bypass -File "${script}" ${parts
+		? `pwsh -NoProfile -ExecutionPolicy Bypass -File "${script}" ${parts
 				.map(part => `"${part}"`)
 				.join(" ")}`
 		: `osascript '${script}' ${parts.map(part => `'${part}'`).join(" ")}`;
