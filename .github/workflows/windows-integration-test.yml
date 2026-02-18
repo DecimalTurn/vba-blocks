@@ -148,6 +148,67 @@ jobs:
         run: |
           vba --version
 
+      # ── Diagnose Excel COM automation ──
+      - name: Diagnose Excel COM
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Write-Host "=== Testing Excel COM automation ==="
+
+          # Test 1: Can we create an Excel instance?
+          try {
+            $excel = New-Object -ComObject "Excel.Application"
+            $excel.Visible = $false
+            $excel.DisplayAlerts = $false
+            Write-Host "PASS: Excel COM object created (Version: $($excel.Version))"
+          } catch {
+            Write-Host "FAIL: Cannot create Excel COM object: $($_.Exception.Message)"
+            exit 0
+          }
+
+          # Test 2: Can we open the bootstrap workbook?
+          $bootstrapPath = "${{ github.workspace }}\scripts\bootstrap\build\bootstrap.xlsm"
+          Write-Host "Opening: $bootstrapPath"
+          try {
+            $wb = $excel.Workbooks.Open($bootstrapPath)
+            Write-Host "PASS: bootstrap.xlsm opened"
+          } catch {
+            Write-Host "FAIL: Cannot open bootstrap.xlsm: $($_.Exception.Message)"
+            $excel.Quit()
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+            exit 0
+          }
+
+          # Test 3: Can we access VBProject?
+          try {
+            $vbp = $wb.VBProject
+            Write-Host "PASS: VBProject accessible (Name: $($vbp.Name))"
+            $componentCount = $vbp.VBComponents.Count
+            Write-Host "  Components: $componentCount"
+            foreach ($comp in $vbp.VBComponents) {
+              Write-Host "  - $($comp.Name) (Type: $($comp.Type))"
+            }
+          } catch {
+            Write-Host "FAIL: Cannot access VBProject: $($_.Exception.Message)"
+          }
+
+          # Test 4: Can we call Application.Run with a simple test?
+          try {
+            # Try calling a macro that doesn't exist to see the error type
+            $result = $excel.Run("Build.ImportGraph", "test")
+            Write-Host "PASS: Application.Run returned: $result"
+          } catch {
+            Write-Host "Application.Run error: $($_.Exception.Message)"
+            Write-Host "HRESULT: $($_.Exception.HResult)"
+            Write-Host "InnerException: $($_.Exception.InnerException)"
+          }
+
+          # Cleanup
+          $wb.Close($false)
+          $excel.Quit()
+          [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+          Write-Host "=== Diagnostics complete ==="
+
       # ── Build the vbapm addin (needed for import/export COM calls) ──
       - name: Build vbapm addin
         id: build-addin
