@@ -30,7 +30,10 @@ async function main() {
 	assert(await pathExists(dir), `Input directory "${input}" not found`);
 
 	const manifest_path = join(dir, "vba_package.toml");
-	assert(await pathExists(manifest_path), `vba_package.toml not found in input directory "${input}"`);
+	assert(
+		await pathExists(manifest_path),
+		`vba_package.toml not found in input directory "${input}"`
+	);
 
 	const { parse } = await import("@decimalturn/toml-patch");
 	const manifest = parse(await readFile(manifest_path, "utf8"));
@@ -58,7 +61,7 @@ async function uploadAndValidate(dir, manifest, { dryrun }) {
 
 	const cksum = await checksum(block_path);
 	await act(dryrun, "Validating checksum...", async () => {
-		const url = joinUrl("https://packages.vbapm.com", block_name);
+		const url = joinUrl("https://packages.vba-blocks.com", block_name);
 		const dest = join(await tmpDir(), block_name);
 
 		await download(url, dest);

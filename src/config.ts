@@ -22,9 +22,9 @@ export interface ConfigValue {
 const empty: ConfigValue = { registry: {}, flags: {} };
 const defaults: ConfigValue = {
 	registry: {
-		"vbapm": {
-			index: "https://github.com/vbapm/registry",
-			packages: "https://packages.vbapm.com"
+		"vba-blocks": {
+			index: "https://github.com/vba-blocks/registry",
+			packages: "https://packages.vba-blocks.com"
 		}
 	},
 	flags: {}

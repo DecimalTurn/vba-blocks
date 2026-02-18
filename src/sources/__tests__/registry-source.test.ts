@@ -29,8 +29,8 @@ describe("utils", () => {
 	});
 
 	test("should get remote package url", () => {
-		expect(getRemotePackage("https://packages.vbapm.com", dictionary)).toEqual(
-			"https://packages.vbapm.com/dictionary-v1.0.0.block"
+		expect(getRemotePackage("https://packages.vba-blocks.com", dictionary)).toEqual(
+			"https://packages.vba-blocks.com/dictionary-v1.0.0.block"
 		);
 	});
 
@@ -41,8 +41,6 @@ describe("utils", () => {
 	});
 
 	test("should get source path", () => {
-		expect(getSource(".vbapm/sources", dictionary)).toEqual(
-			".vbapm/sources/dictionary-v1.0.0"
-		);
+		expect(getSource(".vbapm/sources", dictionary)).toEqual(".vbapm/sources/dictionary-v1.0.0");
 	});
 });

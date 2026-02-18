@@ -24,7 +24,7 @@ const registryRegistration: Registration = {
 	name: "b",
 	version: "1.0.0",
 	dependencies: [],
-	source: "registry+vbapm#<hash>"
+	source: "registry+vba-blocks#<hash>"
 };
 
 const pathDependency: PathDependency = {
@@ -131,7 +131,7 @@ test("should throw on unknown type", async () => {
 function getSources() {
 	const sources: Sources = {
 		registry: {
-			"vbapm": {
+			vbapm: {
 				resolve: jest.fn(_dependency => [registryRegistration]),
 				fetch: jest.fn(_registration => "registry path")
 			}
