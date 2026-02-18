@@ -244,3 +244,7 @@ Scripting = { version = "1.0", guid = "{...}" }
 
 1. Run `npm version patch` (or `minor`/`major`)
 2. Run `npm publish --access public`
+
+## Acknowledgments
+
+This project is a fork of the original [vba-blocks](https://github.com/vba-blocks/vba-blocks) project by [Tim Hall](https://github.com/timhall).
