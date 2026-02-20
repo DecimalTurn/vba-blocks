@@ -1,0 +1,50 @@
+name: Windows Integration Test
+
+on:
+  push:
+    branches:
+      - main*
+      - dev
+      - dev-*
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  excel-integration:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup VBA runtime
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Install globally from local build
+        shell: pwsh
+        run: |
+          npm install -g .
+
+      - name: Verify installation
+        shell: pwsh
+        run: |
+          vba --version
+
+      - name: Run e2e tests
+        shell: pwsh
+        run: |
+          npm run test:e2e
