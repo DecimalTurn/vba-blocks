@@ -22,7 +22,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install vba-blocks
+      - name: Setup VBA runtime
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install CLI standalone App
         shell: pwsh
         run: |
           # Determine the latest release tag via the GitHub API
@@ -36,20 +46,6 @@ jobs:
           $scriptPath = "$env:TEMP\install-vba-blocks.ps1"
           [System.IO.File]::WriteAllBytes($scriptPath, $response.Content)
           & $scriptPath $version
-
-      - name: Setup VBA runtime
-        uses: DecimalTurn/setup-vba@main
-        with:
-          office-apps: Excel
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
-
-      - name: Install CLI standalone App
-        shell: pwsh
-        run: iwr -AllowInsecureRedirect https://vba-blocks.com/install.ps1 | iex
 
       - name: Install Node dependencies and build
         run: |
