@@ -34,7 +34,7 @@ jobs:
 
       - name: Install CLI standalone App
         shell: pwsh
-        run: iwr https://vba-blocks.com/install.ps1 | iex
+        run: iwr -AllowInsecureRedirect https://vba-blocks.com/install.ps1 | iex
 
       - name: Install Node dependencies and build
         run: |
