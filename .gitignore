@@ -6,9 +6,13 @@
 /vendor
 /scripts/registry
 
-# Ignore temporary Excel files
-**/~$*
+# Office temporary files (https://github.com/DecimalTurn/VBA-on-GitHub)
+~$*
 .backup
+
+# Access database lock files (laccdb, ldb)
+*.[lL][aA][cC][cC][dD][bB]
+*.[lL][dD][bB]
 
 # OS and other
 .env

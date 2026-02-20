@@ -1,16 +1,73 @@
-# CRLF -> LF by default, but not for modules or classes (especially classes)
-* text=auto
-*.bas text eol=crlf
-*.cls text eol=crlf
+# Template from: https://github.com/DecimalTurn/VBA-on-GitHub
 
-# Standard to msysgit
-*.doc  diff=astextplain
-*.DOC  diff=astextplain
-*.docx diff=astextplain
-*.DOCX diff=astextplain
-*.dot  diff=astextplain
-*.DOT  diff=astextplain
-*.pdf  diff=astextplain
-*.PDF  diff=astextplain
-*.rtf  diff=astextplain
-*.RTF  diff=astextplain
+# Perform line ending conversions by default
+* text=auto
+
+# VBA extensions - Prevent LF normalization (bas, cls, frm, vba, doccls)
+*.[bB][aA][sS]              -text diff
+*.[cC][lL][sS]              -text diff
+*.[fF][rR][mM]              -text diff
+*.[vV][bB][aA]              -text diff
+*.[dD][oO][cC][cC][lL][sS]  -text diff
+
+# VBA extensions - Mark as binary (frx)
+*.[fF][rR][xX]              binary
+
+############################################################################
+# Other languages in the VB family
+############################################################################
+
+# VBS extensions - Prevent LF normalization (vbs)
+*.[vV][bB][sS]              -text diff
+
+############################################################################
+# Other Windows-specific extensions
+############################################################################
+
+# Batch scripts - Prevent LF normalization (cmd, bat)
+*.[cC][mM][dD]              -text diff
+*.[bB][aA][tT]              -text diff
+
+############################################################################
+# Additional Sections
+############################################################################
+
+# Excel documents (xla, xlam, xls, xlsb, xlsm and xlsx)
+*.[xX][lL][aA]              binary
+*.[xX][lL][aA][mM]          binary
+*.[xX][lL][sS]              binary
+*.[xX][lL][sS][bB]          binary
+*.[xX][lL][sS][mM]          binary
+*.[xX][lL][sS][xX]          binary
+
+# Word documents (rtf, doc and docx)
+*.[rR][tT][fF]              diff=astextplain
+*.[dD][oO][cC]              diff=astextplain
+*.[dD][oO][cC][xX]          diff=astextplain
+
+# PowerPoint documents (ppt and pptx)
+*.[pP][pP][tT]              binary
+*.[pP][pP][tT][xX]          binary
+
+# Access documents (accdb)
+*.[aA][cC][cC][dD][bB]      binary
+
+# Images (jpg, png, bmp, gif, ico)
+*.[jJ][pP][gG]              binary
+*.[pP][nN][gG]              binary
+*.[bB][mM][pP]              binary
+*.[gG][iI][fF]              binary
+*.[iI][cC][oO]              binary
+
+# Compressed files (zip, cab, 7z, gz)
+*.[zZ][iI][pP]              binary
+*.[cC][aA][bB]              binary
+*.[7][zZ]                   binary
+*.[gG][zZ]                  binary
+
+# Executables (exe, dll)
+*.[eE][xX][eE]              binary
+*.[dD][lL][lL]              binary
+
+# Other (pdf)
+*.[pP][dD][fF]              diff=astextplain
