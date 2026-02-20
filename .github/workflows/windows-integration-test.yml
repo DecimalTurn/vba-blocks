@@ -13,7 +13,10 @@ on:
 
 jobs:
   excel-integration:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
