@@ -5,6 +5,7 @@
 /addins/**/build
 /vendor
 /scripts/registry
+/installer
 
 # Office temporary files (https://github.com/DecimalTurn/VBA-on-GitHub)
 ~$*
