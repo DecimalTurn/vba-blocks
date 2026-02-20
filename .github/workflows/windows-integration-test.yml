@@ -22,6 +22,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install vba-blocks
+        shell: pwsh
+        run: |
+          # Determine the latest release tag via the GitHub API
+          $release = Invoke-RestMethod "https://api.github.com/repos/vba-blocks/vba-blocks/releases/latest"
+          $version = $release.tag_name   # e.g. "v0.5.3"
+          Write-Output "Installing vba-blocks $version"
+
+          # Download the install script and save to a temp file so we can
+          # pass the version as a proper argument (iex doesn't support args).
+          $response = iwr "https://vba-blocks.com/install.ps1" -AllowInsecureRedirect
+          $scriptPath = "$env:TEMP\install-vba-blocks.ps1"
+          [System.IO.File]::WriteAllBytes($scriptPath, $response.Content)
+          & $scriptPath $version
+
       - name: Setup VBA runtime
         uses: DecimalTurn/setup-vba@main
         with:
