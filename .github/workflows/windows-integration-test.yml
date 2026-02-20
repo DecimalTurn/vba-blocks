@@ -47,6 +47,13 @@ jobs:
           [System.IO.File]::WriteAllBytes($scriptPath, $response.Content)
           & $scriptPath $version
 
+          # Persist CLI path for subsequent workflow steps.
+          $binDir = Join-Path $env:APPDATA "vba-blocks\bin"
+          if (!(Test-Path (Join-Path $binDir "vba.cmd"))) {
+            throw "Expected vba.cmd in $binDir, but it was not found."
+          }
+          $binDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Install Node dependencies and build
         run: |
           npm install
@@ -60,6 +67,7 @@ jobs:
       - name: Verify installation
         shell: pwsh
         run: |
+          where.exe vba
           vba --version
 
       - name: Build Addins
