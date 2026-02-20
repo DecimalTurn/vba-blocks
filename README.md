@@ -232,12 +232,17 @@ Scripting = { version = "1.0", guid = "{...}" }
 
 1. Run `npm install`
 2. Run `npm run build`
+   <br>It will build the CLI/library in `lib`, plus ensured vendor node runtime is available.
 3. Run `npm run build:addins`
+   <br>It will build the Excel addin that performs workbook/VBA operations from inside Office.
 
 ### Test
 
 1. Run `npm test`
+   <br>It will run unit tests
 2. Run `npm run test:e2e`
+   <br>It will run the end-to-end CLI scenarios in excel.e2e.ts, covering workflows like build, export, new, and version against fixtures.
+   <br>To keep temporary e2e work folders for manual inspection, set `KEEP_E2E_TMP=1` before running (PowerShell: `$env:KEEP_E2E_TMP=1; npm run test:e2e`, cmd: `set KEEP_E2E_TMP=1 && npm run test:e2e`).
 
 ### Release
 
