@@ -7,5 +7,10 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
 
-[*.{bas,cls}]
+[*.md]
+indent_style = space
+indent_size = 2
+
+[*.{bas,frm,cls}]
 end_of_line = crlf
+indent_style = space
