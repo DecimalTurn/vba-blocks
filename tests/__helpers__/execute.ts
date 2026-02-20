@@ -59,18 +59,20 @@ const isBinary = (file: string) => [".xlsm", ".frx"].includes(extname(file));
 export async function readdir(cwd: string): Promise<{ [path: string]: string }> {
 	const files = walkSync(cwd, { directories: false });
 	const details: { [file: string]: string } = {};
-	const checking = files.map(async file => {
-		if (isBackup.test(file) || isGit.test(file)) return;
+	for (const file of files) {
+		if (isBackup.test(file) || isGit.test(file)) continue;
 
 		// TEMP Need reproducible builds to compare binary results
 		if (isBinary(file)) {
 			details[file] = "<TODO>";
 		} else {
 			const data = await readFile(resolve(cwd, file), "utf8");
-			details[file] = basename(file) === "vba-block.toml" ? data : truncate(normalize(data), 200);
+			details[file] =
+				basename(file) === "vba-block.toml"
+					? data
+					: truncate(normalize(data), 200);
 		}
-	});
-	await Promise.all(checking);
+	}
 
 	return details;
 }

@@ -5,6 +5,47 @@ import { execute, readdir, run, RunResult, setup, tmp } from "./__helpers__/exec
 
 jest.setTimeout(30000);
 
+expect.addSnapshotSerializer({
+	test: value => isSnapshotFileMap(value),
+	print: value => formatSnapshotFileMap(value as { [path: string]: string })
+});
+
+function isSnapshotFileMap(value: any): value is { [path: string]: string } {
+	if (!value || typeof value !== "object" || Array.isArray(value)) {
+		return false;
+	}
+
+	const entries = Object.entries(value);
+	if (!entries.length) {
+		return false;
+	}
+
+	return (
+		entries.every(([_, contents]) => typeof contents === "string") &&
+		entries.some(([path]) => path.includes("/") || path.endsWith(".toml"))
+	);
+}
+
+function formatSnapshotFileMap(value: { [path: string]: string }): string {
+	const lines = ["Object {"];
+
+	for (const [path, contents] of Object.entries(value)) {
+		if (contents.includes("\n")) {
+			lines.push(`  ${quote(path)}:`);
+			lines.push(`  ${quote(contents)},`);
+		} else {
+			lines.push(`  ${quote(path)}: ${quote(contents)},`);
+		}
+	}
+
+	lines.push("}");
+	return lines.join("\n");
+}
+
+function quote(value: string): string {
+	return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
 describe("build", () => {
 	test("build standard project", async () => {
 		await setup(standard, "build", async cwd => {
