@@ -45,7 +45,7 @@
 		"sanitize-filename": "^1",
 		"semver": "^5",
 		"tmp": "^0.0",
-		"toml-patch": "^0.2",
+		"@decimalturn/toml-patch": "^0.7",
 		"walk-sync": "^1",
 		"xml-js": "^1.6"
 	},

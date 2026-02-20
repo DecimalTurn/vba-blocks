@@ -401,11 +401,10 @@ Object {
 exports[`throws for invalid syntax 1`] = `
 "vba-blocks.toml is invalid:
 
-Syntax Error: fixtures/projects/invalid-manifest/vba-block.toml (2:6)
+Syntax Error: fixtures/projects/invalid-manifest/vba-block.toml (2:4)
 
-Error parsing TOML (2, 7):
-
+Error parsing TOML (2, 5):
 name: Package Name
-      ^
-Expected \\"=\\" for key-value, found Package"
+    ^
+Use '=' to separate keys and values, not ':'"
 `;
