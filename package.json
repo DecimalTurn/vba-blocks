@@ -82,6 +82,20 @@
 		"url-join": "^4.0.1"
 	},
 	"comments" :{
+		"scripts": {
+			"format": "Formats all .ts and .js files using Prettier",
+			"test": "Runs Jest tests in a single thread",
+			"typecheck": "Runs the TypeScript compiler to check for type errors",
+			"test:e2e": "Runs end-to-end tests using a specific Jest configuration",
+			"build": "Cleans the lib directory, builds the project using Rollup, and ensures vendor files are included",
+			"build:dev": "Allows to quickly rebuild the project in development mode with environment variables set for easier debugging of the js/ts code",
+			"build:addins": "Builds the add-ins by running a custom build script in the addins directory",
+			"build:bootstrap": "Bootstraps the build process by running a custom script that uses the built vba-blocks library",
+			"version": "Prepares a new version by building the project, building add-ins, ensuring vendor files, and creating packages",
+			"postversion": "Pushes commits and tags to the remote repository after versioning",
+			"release": "Runs a custom release script to publish the new version",
+			"clean": "Removes generated files from lib, dist, and addins/build directories"
+		},
 		"devDependencies": {
 			"cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts"
 		}
