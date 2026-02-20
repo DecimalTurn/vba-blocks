@@ -91,7 +91,7 @@
             "scripts.build": "Cleans the lib directory, builds the project using Rollup, and ensures vendor files are included",
             "scripts.build:dev": "Allows to quickly rebuild the project in development mode with environment variables set for easier debugging of the js/ts code",
             "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
-            "scripts.build:bootstrap": "Bootstraps the build process by running a custom script that uses the built vba-blocks library",
+            "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
             "scripts.version": "Prepares a new version by building the project, building add-ins, ensuring vendor files, and creating packages",
             "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
             "scripts.release": "Runs a custom release script to publish the new version",
