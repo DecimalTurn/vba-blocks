@@ -1,0 +1,64 @@
+name: Update Bootstrap
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: Commit message for bootstrap refresh
+        required: false
+        default: "chore: refresh bootstrap workbook"
+
+permissions:
+  contents: write
+
+jobs:
+  update-bootstrap:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup VBA runtime
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build toolchain, add-in, and bootstrap
+        run: |
+          npm run build
+          npm run build:addins
+          npm run build:bootstrap
+
+      - name: Commit updated bootstrap artifacts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add scripts/bootstrap/build/bootstrap.xlsm scripts/bootstrap/vba-block.lock
+
+          if (git diff --staged --quiet) {
+            Write-Output "No bootstrap changes detected."
+            exit 0
+          }
+
+          $message = "${{ github.event.inputs.commit_message }}"
+          if ([string]::IsNullOrWhiteSpace($message)) {
+            $message = "chore: refresh bootstrap workbook"
+          }
+
+          git commit -m $message
+          git push origin HEAD:${{ github.ref_name }}
