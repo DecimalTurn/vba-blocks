@@ -17,6 +17,8 @@ jobs:
         run: npm install
         env:
           CI: true
+      - name: Format Check
+        run: npx prettier --check "**/*.{ts,js}"
       - name: Typecheck
         run: npm run typecheck
       - name: Test
