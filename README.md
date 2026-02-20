@@ -231,9 +231,10 @@ Scripting = { version = "1.0", guid = "{...}" }
 ### Build
 
 1. Run `npm install`
-2. Run `npm run build`
+2. Run `npm run format`
+3. Run `npm run build`
    <br>It will build the CLI/library in `lib`, plus ensured vendor node runtime is available.
-3. Run `npm run build:addins`
+4. Run `npm run build:addins`
    <br>It will build the Excel addin that performs workbook/VBA operations from inside Office.
 
 ### Test
