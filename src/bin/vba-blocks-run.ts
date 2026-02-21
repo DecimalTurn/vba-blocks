@@ -13,7 +13,7 @@ const help = dedent`
     --target=TYPE   Run in pre-built target of type TYPE
     --file=PATH     Full path to workbook or name of add-in`;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;

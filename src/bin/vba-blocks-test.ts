@@ -18,7 +18,7 @@ const help = dedent`
 
   For more information, see https://vba-blocks.com/guides/testing`;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;
