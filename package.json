@@ -81,7 +81,7 @@
         "rollup-plugin-terser": "^7.0.2",
         "ts-jest": "^26.4.2",
         "tslib": "^1.9.3",
-        "typescript": "^3",
+        "typescript": "^5",
         "url-join": "^4.0.1"
     },
     "json-comments": {
