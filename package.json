@@ -6,6 +6,9 @@
     "license": "MIT",
     "bin": "lib/vba-blocks.js",
     "main": "lib/index.js",
+    "engines": {
+        "node": "^22.0.0"
+    },
     "scripts": {
         "format": "prettier --write \"**/*.{ts,js}\"",
         "test": "jest --runInBand",
@@ -60,7 +63,7 @@
         "@types/archiver": "^2",
         "@types/fs-extra": "^5",
         "@types/jest": "^23",
-        "@types/node": "^10",
+        "@types/node": "^22",
         "@types/node-fetch": "^2.1.7",
         "@types/semver": "^5",
         "@types/tmp": "^0.0",

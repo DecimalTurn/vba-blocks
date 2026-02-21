@@ -226,6 +226,7 @@ Scripting = { version = "1.0", guid = "{...}" }
 
 1. `git clone` this repo
 2. Install [node](https://nodejs.org/) v12.19.0 or later
+   - Note: For CLI builds, Node v23+ only supports Windows x64 (win-x64). 32-bit Windows (win-x86) is no longer available upstream.
 3. Install node-gyp dependencies for [Mac](https://github.com/nodejs/node-gyp#on-macos) or [Windows](https://github.com/nodejs/node-gyp#on-windows)
 
 ### Build
