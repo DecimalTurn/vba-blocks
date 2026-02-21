@@ -11,10 +11,11 @@
     },
     "scripts": {
         "format": "prettier --write \"**/*.{ts,js}\"",
+        "format:check": "prettier --check \"**/*.{ts,js}\"",
         "test": "jest --runInBand",
         "typecheck": "tsc",
         "deps": "npm i",
-        "dev": "run-s deps typecheck format test build",
+        "dev": "run-s deps typecheck format:check test build",
         "test:e2e": "jest --config e2e.config.js --runInBand",
         "build": "rimraf lib && rollup -c && node scripts/ensure-vendor",
         "build:dev": "cross-env NODE_ENV=development rollup -c",
