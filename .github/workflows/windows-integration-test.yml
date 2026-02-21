@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Node dependencies and build
         run: |
-          npm install
+          npm install --ci
           npm run build
           npm run build:addins
 
