@@ -12,52 +12,76 @@ param(
     [string[]]$MacroArgs
 )
 
-$ErrorActionPreference = 'Stop'
-
-if (-not $AppName -or -not $File -or -not $Command) {
-    Fail "ERROR #1: Invalid Input (appname, file, and macro are required)"
-}
-
-if ($MacroArgs.Count -gt 10) {
-    Fail "ERROR #2: Invalid Input (only 10 arguments are supported)"
-}
-
-# Unescape arguments
-$UnescapedArgs = @()
-foreach ($arg in $MacroArgs) {
-    $UnescapedArgs += Unescape $arg
-}
-
-Run $AppName $File $Command $UnescapedArgs
-exit 0
-
 # -------
-# Run
+# Helpers
 # -------
 
-function Run {
+function Unescape {
+    param([string]$Value)
+    return $Value -replace '\^q', '"'
+}
+
+function GetFileBase {
+    param([string]$Path)
+    return [System.IO.Path]::GetFileName($Path)
+}
+
+function GetFileName {
+    param([string]$Path)
+    return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+}
+
+function Fail {
+    param([string]$Message)
+    PrintLn "{`"success`":false,`"errors`":[`"$Message`"]}"
+    exit 1
+}
+
+function Print {
+    param([string]$Message)
+    [Console]::Out.Write($Message)
+}
+
+function PrintLn {
+    param([string]$Message)
+    [Console]::Out.WriteLine($Message)
+}
+
+function PrintErr {
+    param([string]$Message)
+    [Console]::Error.Write($Message)
+}
+
+# -------
+# Run Macro
+# -------
+
+# Note: Do NOT name parameters "$Args" — it conflicts with the PowerShell
+# automatic variable $args and can silently become an empty array.
+
+function RunMacro {
     param(
-        [string]$AppName,
-        [string]$FilePath,
+        [object]$ExcelApp,
         [string]$MacroName,
         [string[]]$MacroArgValues
     )
 
-    switch ($AppName) {
-        "excel" {
-            $excel = [Excel]::new()
-            try {
-                $result = $excel.Run($FilePath, $MacroName, $MacroArgValues)
-            } finally {
-                $excel.Dispose()
-            }
-        }
-        default {
-            Fail "ERROR #3: Unsupported App `"$AppName`""
-        }
+    $numArgs = if ($MacroArgValues) { $MacroArgValues.Count } else { 0 }
+    switch ($numArgs) {
+        0  { return $ExcelApp.Run($MacroName) }
+        1  { return $ExcelApp.Run($MacroName, $MacroArgValues[0]) }
+        2  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1]) }
+        3  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2]) }
+        4  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3]) }
+        5  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4]) }
+        6  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5]) }
+        7  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6]) }
+        8  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7]) }
+        9  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7], $MacroArgValues[8]) }
+        10 { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7], $MacroArgValues[8], $MacroArgValues[9]) }
     }
 
-    PrintLn $result
+    return $null
 }
 
 # -------
@@ -142,73 +166,53 @@ class Excel {
 }
 
 # -------
-# Run Macro
+# Run
 # -------
 
-# Note: Do NOT name parameters "$Args" — it conflicts with the PowerShell
-# automatic variable $args and can silently become an empty array.
-
-function RunMacro {
+function Run {
     param(
-        [object]$ExcelApp,
+        [string]$AppName,
+        [string]$FilePath,
         [string]$MacroName,
         [string[]]$MacroArgValues
     )
 
-    $numArgs = if ($MacroArgValues) { $MacroArgValues.Count } else { 0 }
-    switch ($numArgs) {
-        0  { return $ExcelApp.Run($MacroName) }
-        1  { return $ExcelApp.Run($MacroName, $MacroArgValues[0]) }
-        2  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1]) }
-        3  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2]) }
-        4  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3]) }
-        5  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4]) }
-        6  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5]) }
-        7  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6]) }
-        8  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7]) }
-        9  { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7], $MacroArgValues[8]) }
-        10 { return $ExcelApp.Run($MacroName, $MacroArgValues[0], $MacroArgValues[1], $MacroArgValues[2], $MacroArgValues[3], $MacroArgValues[4], $MacroArgValues[5], $MacroArgValues[6], $MacroArgValues[7], $MacroArgValues[8], $MacroArgValues[9]) }
+    switch ($AppName) {
+        "excel" {
+            $excel = [Excel]::new()
+            try {
+                $result = $excel.Run($FilePath, $MacroName, $MacroArgValues)
+            } finally {
+                $excel.Dispose()
+            }
+        }
+        default {
+            Fail "ERROR #3: Unsupported App `"$AppName`""
+        }
     }
 
-    return $null
+    PrintLn $result
 }
 
 # -------
-# Helpers
+# Main
 # -------
 
-function Unescape {
-    param([string]$Value)
-    return $Value -replace '\^q', '"'
+$ErrorActionPreference = 'Stop'
+
+if (-not $AppName -or -not $File -or -not $Command) {
+    Fail "ERROR #1: Invalid Input (appname, file, and macro are required)"
 }
 
-function GetFileBase {
-    param([string]$Path)
-    return [System.IO.Path]::GetFileName($Path)
+if ($MacroArgs.Count -gt 10) {
+    Fail "ERROR #2: Invalid Input (only 10 arguments are supported)"
 }
 
-function GetFileName {
-    param([string]$Path)
-    return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+# Unescape arguments
+$UnescapedArgs = @()
+foreach ($arg in $MacroArgs) {
+    $UnescapedArgs += Unescape $arg
 }
 
-function Fail {
-    param([string]$Message)
-    PrintLn "{`"success`":false,`"errors`":[`"$Message`"]}"
-    exit 1
-}
-
-function Print {
-    param([string]$Message)
-    [Console]::Out.Write($Message)
-}
-
-function PrintLn {
-    param([string]$Message)
-    [Console]::Out.WriteLine($Message)
-}
-
-function PrintErr {
-    param([string]$Message)
-    [Console]::Error.Write($Message)
-}
+Run $AppName $File $Command $UnescapedArgs
+exit 0
