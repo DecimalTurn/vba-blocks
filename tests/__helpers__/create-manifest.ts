@@ -11,8 +11,13 @@ export default function createManifest(options: any): Manifest {
 		devReferences = []
 	} = options;
 
-	const { name = "testing", version = "0.0.0", authors = [], publish = false, target } =
-		pkg || project;
+	const {
+		name = "testing",
+		version = "0.0.0",
+		authors = [],
+		publish = false,
+		target
+	} = pkg || project;
 	const dependencies =
 		options.dependencies && !Array.isArray(options.dependencies)
 			? toDependencies(options.dependencies)

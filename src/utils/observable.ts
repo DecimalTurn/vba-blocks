@@ -5,8 +5,11 @@ export class Observable<TValue> {
 	constructor(private subscriber: Subscriber<TValue>) {}
 
 	subscribe(observer: ObserverFunction<TValue> | Partial<Observer<TValue>>): Subscription {
-		const { next = noop, error = noop, complete = noop } =
-			typeof observer === "function" ? { next: observer } : observer;
+		const {
+			next = noop,
+			error = noop,
+			complete = noop
+		} = typeof observer === "function" ? { next: observer } : observer;
 
 		const cleanup = this.subscriber({ next, error, complete });
 		const unsubscribe = () => {

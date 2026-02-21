@@ -22,9 +22,8 @@ export async function toSrc(graph: BuildGraph): Promise<BuildGraph> {
 }
 
 async function formatComponent(component: Component): Promise<Component> {
-	const { end_of_line, trim_trailing_whitespace, insert_final_newline } = await loadEditorConfig(
-		component
-	);
+	const { end_of_line, trim_trailing_whitespace, insert_final_newline } =
+		await loadEditorConfig(component);
 	const newLine = end_of_line === "lf" ? "\n" : "\r\n";
 
 	const code = component.code;
