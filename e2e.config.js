@@ -5,5 +5,10 @@ module.exports = {
 	testPathIgnorePatterns: ["/node_modules/", "/lib/"],
 	moduleNameMapper: {
 		"^vbapm$": "<rootDir>/src/index.ts"
+	},
+	globals: {
+		"ts-jest": {
+			tsconfig: "tests/tsconfig.json"
+		}
 	}
 };

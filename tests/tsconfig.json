@@ -3,10 +3,13 @@
     "declaration": true,
     "esModuleInterop": true,
     "strict": true,
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2018",
     "lib": ["es2017"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "useUnknownInCatchVariables": false,
     "baseUrl": "..",
     "paths": {
       "vbapm": ["src/index.ts"]
