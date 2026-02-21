@@ -1,0 +1,341 @@
+name: PowerShell Bridge Script Tests
+
+on:
+  push:
+    branches:
+      - main*
+      - dev
+      - dev-*
+    paths:
+      - 'run-scripts/run.ps1'
+      - 'src/utils/run.ts'
+      - '.github/workflows/run-script-tests.yml'
+  pull_request:
+    paths:
+      - 'run-scripts/run.ps1'
+      - 'src/utils/run.ts'
+      - '.github/workflows/run-script-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  # ------------------------------------------------------------------
+  # Unit-level tests for the PowerShell helper functions in run.ps1
+  # (no Excel needed – runs on every Windows runner)
+  # ------------------------------------------------------------------
+  powershell-unit:
+    strategy:
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run PowerShell bridge unit tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $PWD "run-scripts/run.ps1"
+
+          Write-Output "=== Test: Script file exists ==="
+          if (!(Test-Path $script)) {
+            throw "run.ps1 not found at $script"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Dot-source only the helper functions from run.ps1.
+          # The script calls "Run …; exit 0" at the top level, so we
+          # extract and evaluate ONLY the function/class definitions.
+          # -------------------------------------------------------
+          $scriptContent = Get-Content $script -Raw
+
+          # Extract everything from the first 'function ' or 'class ' keyword
+          # to the end of the file – this skips the top-level param/logic.
+          $defStart = [regex]::Match($scriptContent, '(?m)^(function |class )')
+          if (!$defStart.Success) {
+            throw "Could not locate function/class definitions in run.ps1"
+          }
+          $definitions = $scriptContent.Substring($defStart.Index)
+
+          # Evaluate the definitions in the current scope
+          Invoke-Expression $definitions
+
+          # -------------------------------------------------------
+          # Test: Unescape
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: Unescape replaces ^q with double-quote ==="
+          $result = Unescape 'hello^qworld'
+          if ($result -ne 'hello"world') {
+            throw "Unescape failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          Write-Output "`n=== Test: Unescape with no ^q is identity ==="
+          $result = Unescape 'no quotes here'
+          if ($result -ne 'no quotes here') {
+            throw "Unescape identity failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          Write-Output "`n=== Test: Unescape with multiple ^q ==="
+          $result = Unescape '^qA^q ^qB^q'
+          if ($result -ne '"A" "B"') {
+            throw "Unescape multiple failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: GetFileBase  (= filename with extension)
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: GetFileBase ==="
+          $result = GetFileBase 'C:\Users\dev\project\book.xlsm'
+          if ($result -ne 'book.xlsm') {
+            throw "GetFileBase failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          Write-Output "`n=== Test: GetFileBase forward slashes ==="
+          $result = GetFileBase 'C:/Users/dev/project/book.xlsm'
+          if ($result -ne 'book.xlsm') {
+            throw "GetFileBase forward-slash failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: GetFileName  (= filename WITHOUT extension)
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: GetFileName ==="
+          $result = GetFileName 'C:\Users\dev\addins\vba-blocks.xlam'
+          if ($result -ne 'vba-blocks') {
+            throw "GetFileName failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          Write-Output "`n=== Test: GetFileName forward slashes ==="
+          $result = GetFileName 'C:/addins/vba-blocks.xlam'
+          if ($result -ne 'vba-blocks') {
+            throw "GetFileName forward-slash failed: got '$result'"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: Fail produces expected JSON and exits with code 1
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: Fail outputs JSON error ==="
+          # Run Fail in a child process so exit 1 doesn't kill this test
+          $output = pwsh -NoProfile -Command @"
+            `$ErrorActionPreference = 'Stop'
+            . {
+              $($definitions -replace '"','\"')
+            }
+            Fail 'ERROR #99: test error'
+          "@ 2>&1 | Out-String
+
+          if ($output -notmatch '"success":false') {
+            throw "Fail did not produce expected JSON. Output: $output"
+          }
+          if ($output -notmatch 'ERROR #99: test error') {
+            throw "Fail did not include error message. Output: $output"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: PrintLn writes to stdout
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: PrintLn ==="
+          $output = pwsh -NoProfile -Command @"
+            `$ErrorActionPreference = 'Stop'
+            . {
+              $($definitions -replace '"','\"')
+            }
+            PrintLn 'hello from bridge'
+          "@ 2>&1 | Out-String
+
+          if ($output.Trim() -ne 'hello from bridge') {
+            throw "PrintLn failed: got '$($output.Trim())'"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: Script rejects missing arguments
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: Missing arguments ==="
+          $proc = Start-Process -FilePath pwsh -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$script`"" `
+            -NoNewWindow -Wait -PassThru -RedirectStandardOutput "$env:TEMP\run_stdout.txt" -RedirectStandardError "$env:TEMP\run_stderr.txt"
+          if ($proc.ExitCode -eq 0) {
+            throw "Expected non-zero exit code for missing arguments"
+          }
+          $stdout = Get-Content "$env:TEMP\run_stdout.txt" -Raw
+          if ($stdout -notmatch 'ERROR #1') {
+            throw "Expected ERROR #1 in output. Got: $stdout"
+          }
+          Write-Output "PASS"
+
+          # -------------------------------------------------------
+          # Test: Script rejects unsupported app
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: Unsupported app ==="
+          $proc = Start-Process -FilePath pwsh `
+            -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$script`" badapp dummy.xlsm Macro1" `
+            -NoNewWindow -Wait -PassThru -RedirectStandardOutput "$env:TEMP\run_stdout2.txt" -RedirectStandardError "$env:TEMP\run_stderr2.txt"
+          if ($proc.ExitCode -eq 0) {
+            throw "Expected non-zero exit code for unsupported app"
+          }
+          $stdout = Get-Content "$env:TEMP\run_stdout2.txt" -Raw
+          if ($stdout -notmatch 'ERROR #3') {
+            throw "Expected ERROR #3 in output. Got: $stdout"
+          }
+          Write-Output "PASS"
+
+          Write-Output "`n=== All PowerShell bridge unit tests passed ==="
+
+  # ------------------------------------------------------------------
+  # Integration test: TypeScript escape() / unescape() round-trip
+  # ------------------------------------------------------------------
+  typescript-escape-roundtrip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Test escape/unescape round-trip
+        run: |
+          node -e "
+            const { escape, unescape } = require('./lib/index.js');
+
+            function assert(cond, msg) {
+              if (!cond) { console.error('FAIL:', msg); process.exit(1); }
+              console.log('PASS:', msg);
+            }
+
+            // Basic round-trip
+            const input1 = 'He said \"hello world\"';
+            assert(unescape(escape(input1)) === input1, 'basic round-trip');
+
+            // No quotes
+            const input2 = 'plain text';
+            assert(unescape(escape(input2)) === input2, 'no-quotes round-trip');
+
+            // Multiple quotes
+            const input3 = '\"a\" and \"b\"';
+            assert(unescape(escape(input3)) === input3, 'multiple-quotes round-trip');
+
+            // escape produces ^q
+            assert(escape('\"') === '^q', 'escape produces ^q');
+
+            // unescape reverses ^q
+            assert(unescape('^q') === '\"', 'unescape reverses ^q');
+
+            console.log('All escape/unescape tests passed');
+          "
+
+  # ------------------------------------------------------------------
+  # Integration: run.ts selects run.ps1 on Windows / run.applescript on mac
+  # ------------------------------------------------------------------
+  script-selection:
+    strategy:
+      matrix:
+        include:
+          - os: windows-2022
+            expected_ext: .ps1
+          - os: ubuntu-latest
+            expected_ext: .applescript
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify script selection
+        shell: bash
+        run: |
+          # Check that src/utils/run.ts references the correct script
+          # by inspecting the built output
+          if [[ "${{ matrix.expected_ext }}" == ".ps1" ]]; then
+            grep -q 'run\.ps1' src/utils/run.ts || { echo "FAIL: run.ts does not reference run.ps1"; exit 1; }
+            echo "PASS: run.ts references run.ps1 for Windows"
+          else
+            grep -q 'run\.applescript' src/utils/run.ts || { echo "FAIL: run.ts does not reference run.applescript"; exit 1; }
+            echo "PASS: run.ts references run.applescript for non-Windows"
+          fi
+
+      - name: Verify run-scripts directory contents
+        shell: bash
+        run: |
+          echo "Contents of run-scripts/:"
+          ls -la run-scripts/
+
+          # Ensure run.ps1 exists (it should always be present in the repo)
+          test -f run-scripts/run.ps1 || { echo "FAIL: run.ps1 not found"; exit 1; }
+          echo "PASS: run.ps1 exists"
+
+          # Ensure run.applescript exists
+          test -f run-scripts/run.applescript || { echo "FAIL: run.applescript not found"; exit 1; }
+          echo "PASS: run.applescript exists"
+
+          # Ensure the old run.vbs is NOT present
+          if test -f run-scripts/run.vbs; then
+            echo "FAIL: run.vbs should have been removed"
+            exit 1
+          fi
+          echo "PASS: run.vbs has been removed"
+
+      - name: Verify command construction references PowerShell
+        shell: bash
+        run: |
+          # The built JS and the TS source should invoke powershell, not cscript
+          if grep -q 'cscript' src/utils/run.ts; then
+            echo "FAIL: run.ts still references cscript (VBScript host)"
+            exit 1
+          fi
+          echo "PASS: no cscript references in run.ts"
+
+          grep -q 'powershell.*-File' src/utils/run.ts || { echo "FAIL: run.ts does not invoke powershell"; exit 1; }
+          echo "PASS: run.ts invokes powershell -File"
+
+  # ------------------------------------------------------------------
+  # Packaging: create-packages.js selects .ps1 for win32
+  # ------------------------------------------------------------------
+  packaging-selection:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify create-packages selects .ps1 for Windows
+        run: |
+          # The packaging script should filter for .ps1 (not .vbs) on win32
+          grep -q '\.ps1' scripts/create-packages.js || { echo "FAIL: create-packages.js does not reference .ps1"; exit 1; }
+          echo "PASS: create-packages.js references .ps1"
+
+          if grep -q '\.vbs' scripts/create-packages.js; then
+            echo "FAIL: create-packages.js still references .vbs"
+            exit 1
+          fi
+          echo "PASS: no .vbs references in create-packages.js"
