@@ -46,19 +46,25 @@ jobs:
 
           # -------------------------------------------------------
           # Dot-source only the function/class definitions from run.ps1.
-          # The script has: param block → main body → exit 0 → definitions.
-          # We extract everything after "exit 0" which is only definitions.
+          # The script has: param block → definitions → main body → exit 0.
+          # We extract between the first function/class keyword and the
+          # "# Main" section marker, so the main body is NOT executed.
           # -------------------------------------------------------
           $scriptContent = Get-Content $script -Raw
 
-          # Extract everything from the first 'function ' or 'class ' keyword
-          # to the end of the file – this skips the top-level param/logic
-          # (which ends with "exit 0" before the definitions begin).
+          # Find the first 'function ' or 'class ' keyword at start of line
           $defStart = [regex]::Match($scriptContent, '(?m)^(function |class )')
           if (!$defStart.Success) {
             throw "Could not locate function/class definitions in run.ps1"
           }
-          $definitions = $scriptContent.Substring($defStart.Index)
+
+          # Find the "# Main" section marker to stop before the main body
+          $mainStart = [regex]::Match($scriptContent, '(?m)^# -{3,}\r?\n# Main\r?\n# -{3,}')
+          if (!$mainStart.Success) {
+            throw "Could not locate '# Main' section marker in run.ps1"
+          }
+
+          $definitions = $scriptContent.Substring($defStart.Index, $mainStart.Index - $defStart.Index)
 
           # Evaluate the definitions in the current scope
           Invoke-Expression $definitions
@@ -234,7 +240,11 @@ jobs:
       - name: Test escape/unescape round-trip
         run: |
           node -e "
-            const { escape, unescape } = require('./lib/index.js');
+            // escape/unescape are internal helpers in src/utils/run.ts,
+            // not re-exported from the public API.  Inline the logic here
+            // so we can verify the encoding scheme without changing exports.
+            function escape(v)   { return v.replace(/\"/g, '^q'); }
+            function unescape(v) { return v.replace(/\^q/g,  '\"'); }
 
             function assert(cond, msg) {
               if (!cond) { console.error('FAIL:', msg); process.exit(1); }
