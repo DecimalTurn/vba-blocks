@@ -1,0 +1,89 @@
+name: Windows Package E2E Test
+
+on:
+  push:
+    branches:
+      - main*
+      - dev
+      - dev-*
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  excel-integration:
+    strategy:
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup VBA runtime
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Install Node dependencies and build
+        run: |
+          npm install
+          npm run build
+          npm run build:addins
+
+      - name: Install globally from local build
+        shell: pwsh
+        run: |
+          npm install -g .
+
+      - name: Setup VBA project object model access
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $addinsDir = Join-Path (npm prefix -g) "node_modules\vbapm\addins\build"
+
+          function New-Shortcut ($src, $dest) {
+            try {
+              $wshShell = New-Object -comObject WScript.Shell
+              $shortcut = $wshShell.CreateShortcut($dest)
+              $shortcut.TargetPath = $src
+              $shortcut.Save()
+            } catch {
+              Write-Output "Failed to link add-ins, they can instead be found in $addinsDir."
+            }
+          }
+
+          Write-Output "Creating shortcut to add-ins..."
+          New-Shortcut "$addinsDir" "$env:AppData\Microsoft\Addins\vba-blocks Add-ins.lnk"
+
+          function Enable-VBOM ($app) {
+            try {
+              $curVer = Get-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\$app.Application\CurVer -ErrorAction Stop
+              $version = $curVer.'(default)'.replace("$app.Application.", "") + ".0"
+              Set-ItemProperty -Path HKCU:\Software\Microsoft\Office\$version\$app\Security -Name AccessVBOM -Value 1 -ErrorAction Stop
+            } catch {
+              Write-Output "Failed to enable access to VBA project object model for $app."
+            }
+          }
+
+          Write-Output "Enabling access to VBA project object model..."
+          Enable-VBOM "Excel"
+
+      - name: Verify installation
+        shell: pwsh
+        run: |
+          where.exe vba
+          vba --version
+
+      - name: Run e2e tests
+        shell: pwsh
+        run: |
+          npm run test:e2e

@@ -1,28 +1,55 @@
 {
-    "name": "vba-blocks",
-    "version": "0.5.3",
-    "repository": "https://github.com/vba-blocks/vba-blocks.git",
+    "name": "vbapm",
+    "version": "0.6.0",
+    "description": "A package manager and build tool for VBA",
+    "repository": "https://github.com/vbapm/core.git",
     "author": "Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)",
     "license": "MIT",
-    "bin": "lib/vba-blocks.js",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "bin": {
+        "vba-blocks": "lib/vba-blocks.js",
+        "vba": "lib/vba-blocks.js"
+    },
     "main": "lib/index.js",
+    "types": "lib/src/index.d.ts",
+    "exports": {
+        ".": {
+            "require": "./lib/index.js",
+            "types": "./lib/src/index.d.ts"
+        }
+    },
+    "files": [
+        "lib/",
+        "addins/build/",
+        "run-scripts/",
+        "LICENSE",
+        "README.md"
+    ],
     "scripts": {
         "format": "prettier --write \"**/*.{ts,js}\"",
         "test": "jest --runInBand",
         "typecheck": "tsc",
         "test:e2e": "jest --config e2e.config.js --runInBand",
-        "build": "rimraf lib && rollup -c && node scripts/ensure-vendor",
+        "build": "rimraf lib && rollup -c && tsc -p tsconfig.build.json",
+        "build:standalone": "npm run build && node scripts/ensure-vendor",
         "build:dev": "cross-env NODE_ENV=development rollup -c",
         "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
         "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vba-blocks build",
-        "version": "npm run build && npm run build:addins && node scripts/ensure-vendor && node scripts/create-packages",
+        "prepublishOnly": "npm run build",
+        "version": "npm run build:standalone && npm run build:addins && node scripts/create-packages",
         "postversion": "git push && git push --tags",
         "release": "node scripts/release",
         "clean": "rimraf lib && rimraf dist && rimraf addins/build"
     },
     "jest": {
         "preset": "ts-jest",
-        "testEnvironment": "node"
+        "testEnvironment": "node",
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "/lib/"
+        ]
     },
     "dependencies": {
         "@timhall/ansi-colors": "^5.0.0",
@@ -88,11 +115,13 @@
             "scripts.test": "Runs Jest tests in a single thread",
             "scripts.typecheck": "Runs the TypeScript compiler to check for type errors",
             "scripts.test:e2e": "Runs end-to-end tests using a specific Jest configuration",
-            "scripts.build": "Cleans the lib directory, builds the project using Rollup, and ensures vendor files are included",
+            "scripts.build": "Cleans the lib directory, builds the project using Rollup, and generates type declarations",
+            "scripts.build:standalone": "Runs the full build and downloads the vendored Node binary for standalone distribution",
             "scripts.build:dev": "Allows to quickly rebuild the project in development mode with environment variables set for easier debugging of the js/ts code",
             "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
             "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
-            "scripts.version": "Prepares a new version by building the project, building add-ins, ensuring vendor files, and creating packages",
+            "scripts.prepublishOnly": "Ensures lib/ is fresh before npm publish",
+            "scripts.version": "Prepares a new version by building the standalone distribution, building add-ins, and creating platform packages",
             "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
             "scripts.release": "Runs a custom release script to publish the new version",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",

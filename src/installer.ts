@@ -1,4 +1,6 @@
 import { differenceInCalendarDays } from "date-fns";
+import { existsSync } from "fs";
+import fetch from "node-fetch";
 import { gt as semverGreaterThan } from "semver";
 import { version as currentVersion } from "../package.json";
 import { cache } from "./cache";
@@ -6,6 +8,9 @@ import { env } from "./env";
 import { getLatestRelease } from "./utils/github";
 
 const debug = env.debug("vba-blocks:installer");
+
+const IS_STANDALONE = existsSync(env.bin);
+const NPM_PACKAGE_NAME = "vbapm";
 
 export function updateVersion(): string | undefined {
 	return cache.latest_version;
@@ -32,15 +37,29 @@ export async function checkForUpdate(): Promise<boolean> {
 	cache.latest_version_checked = Date.now();
 
 	try {
-		const { tag_name: latestVersion } = await getLatestRelease({
-			owner: "vba-blocks",
-			repo: "vba-blocks"
-		});
+		let latestVersion: string;
+
+		if (IS_STANDALONE) {
+			// Standalone distribution: check GitHub releases
+			const { tag_name } = await getLatestRelease({
+				owner: "vbapm",
+				repo: "core"
+			});
+			latestVersion = tag_name;
+		} else {
+			// npm distribution: check npm registry
+			const response = await fetch(
+				`https://registry.npmjs.org/${NPM_PACKAGE_NAME}/latest`
+			);
+			const data: any = await response.json();
+			latestVersion = data.version;
+		}
+
 		cache.latest_version = latestVersion;
 
 		return semverGreaterThan(latestVersion, currentVersion);
 	} catch (error) {
-		debug("Error loading latest release");
+		debug("Error checking for update");
 		debug(error);
 		return false;
 	}

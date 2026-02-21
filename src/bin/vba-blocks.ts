@@ -5,6 +5,7 @@ import mri, { Args } from "mri";
 import { version } from "../../package.json";
 import { env } from "../env";
 import { cleanError, CliError, ErrorCode, isCliError } from "../errors";
+import { existsSync } from "fs";
 import { checkForUpdate, updateAvailable, updateVersion } from "../installer";
 import { Message } from "../messages";
 import { isRunError } from "../utils/run";
@@ -64,11 +65,21 @@ const help = dedent`
   Use 'vba-blocks help COMMAND' for help on specific commands.
   Visit https://vba-blocks.com to learn more about vba-blocks.`;
 
-const updateAvailableMessage = () => dedent`
-  \n${greenBright("New Update!")} ${updateVersion()!}
+const updateAvailableMessage = () => {
+	const isStandalone = existsSync(env.bin);
+	if (isStandalone) {
+		return dedent`
+		  \n${greenBright("New Update!")} ${updateVersion()!}
 
-  A new version of vba-blocks is available.
-  Visit https://vba-blocks.com/update for more information.`;
+		  A new version of vba-blocks is available.
+		  Visit https://vba-blocks.com/update for more information.`;
+	}
+	return dedent`
+	  \n${greenBright("New Update!")} ${updateVersion()!}
+
+	  A new version of vba-blocks is available.
+	  Run "npm update -g vbapm" to update.`;
+};
 
 process.title = "vba-blocks";
 process.on("unhandledRejection", handleError);
