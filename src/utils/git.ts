@@ -4,43 +4,52 @@ import { pathExists } from "./fs";
 import { join } from "./path";
 
 const debug = env.debug("vba-blocks:git");
+const DEFAULT_GIT_IDENTITY = {
+	name: "vbapm",
+	email: "vbapm@local"
+};
 
-interface Git {
-	clone(options: { dir: string; url: string; depth?: number }): Promise<void>;
-	pull(options: { dir: string }): Promise<void>;
-	init(options: { dir: string }): Promise<void>;
-}
-
-async function loadGit(): Promise<Git> {
+async function loadGit() {
 	const fetch = await import("node-fetch");
 	(global as any).fetch = fetch.default;
 
 	const git = await import("isomorphic-git");
-	git.plugins.set("fs", fs);
+	const httpNode = await import("isomorphic-git/http/node");
 
-	return git;
+	return {
+		git,
+		http: httpNode.default
+	};
 }
 
 export async function clone(remote: string, name: string, cwd: string) {
-	const git = await loadGit();
+	const { git, http } = await loadGit();
 	const dir = join(cwd, name);
 
 	debug(`clone: ${remote} to ${dir}`);
-	await git.clone({ dir, url: remote, depth: 1 });
+	await git.clone({ fs, http, dir, url: remote, depth: 1 });
 }
 
 export async function pull(local: string) {
-	const git = await loadGit();
+	const { git, http } = await loadGit();
+	const ref = await git.currentBranch({ fs, dir: local, fullname: false });
 
-	debug(`pull: ${local}`);
-	await git.pull({ dir: local });
+	debug(`pull: ${local}${ref ? ` (${ref})` : ""}`);
+	await git.pull({
+		fs,
+		http,
+		dir: local,
+		ref: ref || undefined,
+		author: DEFAULT_GIT_IDENTITY,
+		committer: DEFAULT_GIT_IDENTITY
+	});
 }
 
 export async function init(dir: string) {
-	const git = await loadGit();
+	const { git } = await loadGit();
 
 	debug(`init: ${dir}`);
-	await git.init({ dir });
+	await git.init({ fs, dir });
 }
 
 export async function isGitRepository(dir: string): Promise<boolean> {

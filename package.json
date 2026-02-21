@@ -48,7 +48,7 @@
         "editorconfig": "^0.15.3",
         "env-paths": "^2",
         "fs-extra": "^7",
-        "isomorphic-git": "^0.58",
+        "isomorphic-git": "^1.37.1",
         "logic-solver": "^2",
         "meant": "^1.0",
         "mri": "^1",
@@ -74,7 +74,7 @@
         "@types/fs-extra": "^5",
         "@types/jest": "^29",
         "@types/node": "^22",
-        "@types/node-fetch": "^2.1.7",
+        "@types/node-fetch": "^2.6.13",
         "@types/semver": "^5",
         "@types/tmp": "^0.0",
         "aws-sdk": "^2.562.0",
@@ -110,7 +110,11 @@
             "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
             "scripts.release": "Runs a custom release script to publish the new version",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
-            "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts"
+            "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts",
+            "overrides": "Pins vulnerable transitive dependencies to patched versions to remove critical npm audit findings without large upstream upgrades.",
+            "overrides.minimist": "Prototype pollution fix, mainly needed for ts-jest/handlebars transitive chain.",
+            "overrides.underscore": "Arbitrary code execution mitigation, mainly needed for logic-solver transitive dependency.",
+            "overrides.shell-quote": "Command injection advisory mitigation, mainly needed for npm-run-all transitive dependency."
         }
     }
 }
