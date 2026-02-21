@@ -40,7 +40,7 @@ export const pathExists = jest.fn(async (path: string) => {
 	return await _pathExists(path);
 });
 
-export const readFile = jest.fn(async (path: string, encoding?: string) => {
+export const readFile = jest.fn(async (path: string, encoding?: BufferEncoding) => {
 	path = normalize(path);
 	if (filesystem[path] === null) throw ENOENT(path);
 

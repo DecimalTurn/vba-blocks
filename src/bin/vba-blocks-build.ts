@@ -14,7 +14,7 @@ const help = dedent`
     --release       Exclude dev-* items from build
     --open          Open built target`;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;

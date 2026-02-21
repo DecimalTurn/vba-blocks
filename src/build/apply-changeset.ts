@@ -84,6 +84,10 @@ async function writeComponent(path: string, component: Component) {
 	await writeFile(path, component.code);
 
 	if (component.binaryPath) {
+		if (!component.details.binary) {
+			throw new Error(`Binary data missing for component "${component.name}"`);
+		}
+
 		await writeFile(join(dir, component.binaryPath), component.details.binary);
 	}
 }

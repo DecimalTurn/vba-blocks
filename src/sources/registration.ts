@@ -43,9 +43,11 @@ export function getRegistrationSource(type: string, value: string, details?: str
 	return source;
 }
 
-export function getSourceParts(
-	source: string
-): { type: string; value: string; details: string | undefined } {
+export function getSourceParts(source: string): {
+	type: string;
+	value: string;
+	details: string | undefined;
+} {
 	const [info, ...details] = source.split("#");
 	const [type, ...value] = info.split("+");
 

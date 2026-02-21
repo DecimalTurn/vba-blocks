@@ -78,8 +78,8 @@ export async function run(
 	try {
 		const { stdout, stderr } = await exec(command);
 		result = toResult(stdout, stderr);
-	} catch (err) {
-		result = toResult(err.stdout, err.stderr, err);
+	} catch (err: any) {
+		result = toResult(err?.stdout, err?.stderr, err);
 	}
 
 	if (!result.success) {

@@ -18,7 +18,7 @@ export function watchFile(file: string): Observable<string> {
 		const watching = basename(file);
 		let cursor = 0;
 
-		watch(file, { persistent: false }, (event: string, filename: string) => {
+		watch(file, { persistent: false }, (event: string, filename: string | null) => {
 			if (filename === watching && event === "change") {
 				const buffer = readFileSync(file);
 				const next = buffer.toString("utf8", cursor).trim();

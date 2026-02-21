@@ -10,7 +10,7 @@ const help = dedent`
   Options:
     --target=TYPE   Export target of type TYPE`;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;

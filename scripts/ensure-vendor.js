@@ -6,7 +6,13 @@ const { ensureDir, pathExists, remove, writeFile, readFile } = require("fs-extra
 const tmpDir = promisify(require("tmp").dir);
 const decompress = require("decompress");
 
-const node_version = "v12.13.0";
+const node_version = "v22.22.0";
+
+// Node.js dropped win-x86 binaries after v22.x. For v23+, use win-x64 only.
+function getWindowsArch(version) {
+	const major = parseInt(version.replace(/^v/, "").split(".")[0], 10);
+	return major >= 23 ? "x64" : "x86";
+}
 const vendor = join(__dirname, "../vendor");
 const version = join(vendor, ".version");
 
@@ -26,10 +32,11 @@ async function downloadNode() {
 	if (previous_version === node_version) return;
 
 	const base = `https://nodejs.org/dist/${node_version}/`;
-	const windows = `node-${node_version}-win-x86.zip`;
+	const winArch = getWindowsArch(node_version);
+	const windows = `node-${node_version}-win-${winArch}.zip`;
 	const mac = `node-${node_version}-darwin-x64.tar.gz`;
 
-	console.log(`Downloading node ${node_version}...`);
+	console.log(`Downloading node ${node_version} (win-${winArch}, mac-x64)...`);
 
 	const dir = await tmpDir();
 	await Promise.all([

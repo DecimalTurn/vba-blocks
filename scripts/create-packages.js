@@ -52,11 +52,7 @@ function getInput(platform) {
 	const vendor = ls(join(root, "vendor")).filter(compatibleExe);
 
 	const input = {};
-	for (const file of addins
-		.concat(run_scripts)
-		.concat(lib)
-		.concat(bin)
-		.concat(vendor)) {
+	for (const file of addins.concat(run_scripts).concat(lib).concat(bin).concat(vendor)) {
 		input[file] = relative(root, file);
 	}
 

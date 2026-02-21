@@ -41,7 +41,7 @@ export async function buildTarget(target: Target, info: ProjectInfo, options: Bu
 		staged = !info.blankTarget
 			? await createTarget(project, target)
 			: await createDocument(project, target, { staging: true });
-	} catch (error) {
+	} catch (error: any) {
 		// Error "1004: Method 'CreateDocument' of object 'OfficeApplication' failed"
 		// occurs when trying to create a document with the same name on Mac
 		if (!isRunError(error) || !error.result.errors.some(isCreateDocumentError)) throw error;
@@ -82,7 +82,7 @@ export async function createTarget(project: Project, target: Target): Promise<st
 	try {
 		await ensureDir(project.paths.staging);
 		await zip(target.path!, file);
-	} catch (err) {
+	} catch (err: any) {
 		throw new CliError(
 			ErrorCode.TargetCreateFailed,
 			`Failed to create project for target "${target.name}".`,
@@ -118,7 +118,7 @@ export async function importTarget(
 
 	try {
 		await importGraph(project, target, import_graph, file, options);
-	} catch (err) {
+	} catch (err: any) {
 		throw new CliError(
 			ErrorCode.TargetImportFailed,
 			`Failed to import project for target "${target.name}".`,
@@ -145,7 +145,7 @@ export async function backupTarget(project: Project, target: Target) {
 
 		try {
 			await move(file, backup);
-		} catch (err) {
+		} catch (err: any) {
 			throw new CliError(ErrorCode.TargetIsOpen, targetIsOpen(target, file));
 		}
 	}
@@ -162,7 +162,7 @@ export async function restoreTarget(project: Project, target: Target) {
 
 	try {
 		await copy(backup, file);
-	} catch (err) {
+	} catch (err: any) {
 		throw new CliError(
 			ErrorCode.TargetRestoreFailed,
 			dedent`

@@ -4,7 +4,7 @@ interface EnvironmentOptions {
 export declare function setupEnvironment(cwd: string, options?: EnvironmentOptions): void;
 export declare function setup(
 	cwd: string,
-	options?: EnvironmentOptions,
+	options?: EnvironmentOptions
 ): Promise<{
 	project: import("../../src/project").Project;
 	dependencies: import("../../src/manifest").Manifest[];

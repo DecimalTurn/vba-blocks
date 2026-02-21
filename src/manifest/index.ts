@@ -152,13 +152,13 @@ export async function loadManifest(dir: string): Promise<Manifest> {
 	let parsed;
 	try {
 		parsed = await parseToml(raw.toString());
-	} catch (err) {
+	} catch (err: any) {
 		throw new CliError(
 			ErrorCode.ManifestInvalid,
 			dedent`
 				vba-blocks.toml is invalid:
 
-				Syntax Error: ${file} (${err.line}:${err.column})\n\n${err.message}
+				Syntax Error: ${file} (${err?.line}:${err?.column})\n\n${err?.message || err}
 			`
 		);
 	}

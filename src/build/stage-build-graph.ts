@@ -10,6 +10,10 @@ export async function stageBuildGraph(graph: BuildGraph, staging: string): Promi
 
 		if (component.binaryPath) {
 			const binaryPath = join(staging, basename(component.binaryPath));
+			if (!component.details.binary) {
+				throw new Error(`Binary data missing for component "${component.name}"`);
+			}
+
 			await writeFile(binaryPath, component.details.binary);
 		}
 

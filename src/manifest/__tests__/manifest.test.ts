@@ -178,8 +178,8 @@ test("throws for invalid syntax", async () => {
 
 	try {
 		await loadManifest(invalidManifest);
-	} catch (err) {
-		expect(err.message.replace(FIXTURES, "fixtures")).toMatchSnapshot();
+	} catch (err: any) {
+		expect((err?.message || "").replace(FIXTURES, "fixtures")).toMatchSnapshot();
 	}
 });
 

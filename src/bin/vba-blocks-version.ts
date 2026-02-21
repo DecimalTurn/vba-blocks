@@ -11,7 +11,7 @@ const help = dedent`
     <increment>   VERSION | patch | minor | major | prepatch | preminor | premajor
     --preid=TYPE   Use TYPE for prerelease (e.g. "beta")`;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;

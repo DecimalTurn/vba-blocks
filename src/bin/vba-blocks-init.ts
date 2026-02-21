@@ -19,7 +19,7 @@ const help = dedent`
   vba-blocks init --name calculations --package
   `;
 
-export default async function(args: Args) {
+export default async function (args: Args) {
 	if (args.help) {
 		console.log(help);
 		return;
