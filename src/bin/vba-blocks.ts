@@ -133,8 +133,8 @@ async function main() {
 	try {
 		debug(`loading "./vba-blocks-${command}.js"`);
 		subcommand = await commands[command]();
-	} catch (err) {
-		throw new Error(`Failed to load command "${command}".\n${err.stack}`);
+	} catch (err: any) {
+		throw new Error(`Failed to load command "${command}".\n${err?.stack || err}`);
 	}
 
 	debug(`starting "${command}" with args ${JSON.stringify(args)}`);
