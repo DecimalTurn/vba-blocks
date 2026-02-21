@@ -1,0 +1,277 @@
+name: Fast Iteration Test (Experimental)
+
+# This is an experimental workflow designed to speed up development iterations.
+# Key optimization: setup-vba runs only ONCE, then the workflow polls for new commits
+# and retries the build+test cycle without re-running the expensive setup step.
+#
+# Usage: Trigger manually via workflow_dispatch while iterating on fixes.
+# Expected time savings: ~5 minutes per retry iteration.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_retries:
+        description: 'Maximum number of retries (default: 3)'
+        required: false
+        default: '3'
+      poll_duration_seconds:
+        description: 'How long to poll for new commits in seconds (default: 300 = 5min)'
+        required: false
+        default: '300'
+
+concurrency:
+  group: fast-iteration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast-iteration:
+    runs-on: windows-2022
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup VBA runtime (ONCE - expensive step)
+        uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - name: Setup Node.js (ONCE)
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install Node dependencies (ONCE)
+        run: npm install
+
+      - name: Build, Test, and Retry Loop
+        shell: pwsh
+        env:
+          MAX_RETRIES: ${{ github.event.inputs.max_retries || '3' }}
+          POLL_DURATION: ${{ github.event.inputs.poll_duration_seconds || '300' }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $maxRetries = [int]$env:MAX_RETRIES
+          $pollDuration = [int]$env:POLL_DURATION
+          $pollInterval = 30  # Check every 30 seconds
+          $attempt = 0
+          $initialSha = git rev-parse HEAD
+
+          Write-Output "========================================="
+          Write-Output "Fast Iteration Test - Configuration"
+          Write-Output "========================================="
+          Write-Output "Initial commit: $initialSha"
+          Write-Output "Max retries: $maxRetries"
+          Write-Output "Poll duration: $pollDuration seconds"
+          Write-Output "Poll interval: $pollInterval seconds"
+          Write-Output "========================================="
+          Write-Output ""
+
+          function Invoke-BuildAndTest {
+            param([int]$attemptNumber)
+
+            Write-Output ""
+            Write-Output "========================================="
+            Write-Output "Attempt #$attemptNumber"
+            Write-Output "Current commit: $(git rev-parse HEAD)"
+            Write-Output "========================================="
+
+            try {
+              # Clean build artifacts (preserve node_modules and VBA setup)
+              Write-Output "[Step 1/5] Cleaning build artifacts..."
+              if (Test-Path "lib") { Remove-Item lib -Recurse -Force }
+              if (Test-Path "addins/build") { Remove-Item addins/build -Recurse -Force }
+
+              # Build
+              Write-Output "[Step 2/5] Building project..."
+              npm run build
+              if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+
+              npm run build:addins
+              if ($LASTEXITCODE -ne 0) { throw "Build addins failed" }
+
+              # Install CLI
+              Write-Output "[Step 3/5] Installing CLI..."
+              $libDir = Join-Path $env:APPDATA "vba-blocks"
+              $binDir = Join-Path $libDir "bin"
+              $addinsDir = Join-Path $libDir "addins\build"
+
+              New-Item -ItemType Directory -Force -Path $libDir | Out-Null
+
+              $sources = @("bin", "lib", "vendor", "run-scripts", "addins")
+              foreach ($source in $sources) {
+                $sourcePath = Join-Path $PWD $source
+                $destPath = Join-Path $libDir $source
+
+                if (!(Test-Path $sourcePath)) {
+                  throw "Expected local build path not found: $sourcePath"
+                }
+
+                if (Test-Path $destPath) {
+                  Remove-Item $destPath -Recurse -Force
+                }
+
+                Copy-Item $sourcePath $destPath -Recurse -Force
+              }
+
+              $user = [EnvironmentVariableTarget]::User
+              $path = [Environment]::GetEnvironmentVariable('Path', $user)
+              if (!((";$path;").ToLower() -like "*;$binDir;*".ToLower())) {
+                [Environment]::SetEnvironmentVariable('Path', "$path;$binDir", $user)
+              }
+              $env:Path += ";$binDir"
+              $binDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+              function New-Shortcut ($src, $dest) {
+                try {
+                  $wshShell = New-Object -comObject WScript.Shell
+                  $shortcut = $wshShell.CreateShortcut($dest)
+                  $shortcut.TargetPath = $src
+                  $shortcut.Save()
+                } catch {
+                  Write-Output "Failed to link add-ins, they can instead be found in $addinsDir."
+                }
+              }
+
+              New-Shortcut "$addinsDir" "$env:AppData\Microsoft\Addins\vba-blocks Add-ins.lnk"
+
+              function Enable-VBOM ($app) {
+                try {
+                  $curVer = Get-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\$app.Application\CurVer -ErrorAction Stop
+                  $version = $curVer.'(default)'.replace("$app.Application.", "") + ".0"
+                  Set-ItemProperty -Path HKCU:\Software\Microsoft\Office\$version\$app\Security -Name AccessVBOM -Value 1 -ErrorAction Stop
+                } catch {
+                  Write-Output "Failed to enable access to VBA project object model for $app."
+                }
+              }
+
+              Enable-VBOM "Excel"
+
+              if (!(Test-Path (Join-Path $binDir "vba.cmd"))) {
+                throw "Expected vba.cmd in $binDir, but it was not found."
+              }
+
+              # Verify installation
+              Write-Output "[Step 4/5] Verifying installation..."
+              where.exe vba
+              vba --version
+
+              # Run tests
+              Write-Output "[Step 5/5] Running e2e tests..."
+              npm run test:e2e
+              if ($LASTEXITCODE -ne 0) { throw "Tests failed" }
+
+              Write-Output ""
+              Write-Output "✅ SUCCESS - All tests passed!"
+              return $true
+
+            } catch {
+              Write-Output ""
+              Write-Output "❌ FAILED - $_"
+              return $false
+            }
+          }
+
+          function Test-NewCommit {
+            param([string]$currentSha)
+
+            try {
+              git fetch origin ${{ github.ref_name }} 2>&1 | Out-Null
+              $remoteSha = git rev-parse "origin/${{ github.ref_name }}"
+
+              if ($remoteSha -ne $currentSha) {
+                Write-Output "🔄 New commit detected: $remoteSha"
+                return $remoteSha
+              }
+              return $null
+            } catch {
+              Write-Output "Warning: Failed to check for new commits - $_"
+              return $null
+            }
+          }
+
+          # Main loop
+          while ($attempt -lt $maxRetries) {
+            $attempt++
+
+            $success = Invoke-BuildAndTest -attemptNumber $attempt
+
+            if ($success) {
+              Write-Output ""
+              Write-Output "========================================="
+              Write-Output "🎉 Workflow completed successfully!"
+              Write-Output "Total attempts: $attempt"
+              Write-Output "========================================="
+              exit 0
+            }
+
+            # If we've reached max retries, exit
+            if ($attempt -ge $maxRetries) {
+              Write-Output ""
+              Write-Output "========================================="
+              Write-Output "❌ Maximum retries ($maxRetries) reached"
+              Write-Output "========================================="
+              exit 1
+            }
+
+            # Poll for new commits
+            Write-Output ""
+            Write-Output "========================================="
+            Write-Output "Polling for new commits..."
+            Write-Output "Duration: $pollDuration seconds"
+            Write-Output "Checking every: $pollInterval seconds"
+            Write-Output "========================================="
+
+            $currentSha = git rev-parse HEAD
+            $elapsed = 0
+            $newCommitFound = $false
+
+            while ($elapsed -lt $pollDuration) {
+              Start-Sleep -Seconds $pollInterval
+              $elapsed += $pollInterval
+
+              Write-Output "⏱️  Polling... ($elapsed/$pollDuration seconds elapsed)"
+
+              $newSha = Test-NewCommit -currentSha $currentSha
+              if ($newSha) {
+                $newCommitFound = $true
+
+                Write-Output ""
+                Write-Output "========================================="
+                Write-Output "New commit found! Preparing for retry..."
+                Write-Output "Old: $currentSha"
+                Write-Output "New: $newSha"
+                Write-Output "========================================="
+
+                # Cleanup and checkout new commit
+                Write-Output "Cleaning workspace..."
+                git reset --hard 2>&1 | Out-Null
+                git clean -fdx -e node_modules 2>&1 | Out-Null
+
+                Write-Output "Checking out new commit..."
+                git checkout ${{ github.ref_name }} 2>&1 | Out-Null
+                git pull origin ${{ github.ref_name }} 2>&1 | Out-Null
+
+                break
+              }
+            }
+
+            if (!$newCommitFound) {
+              Write-Output ""
+              Write-Output "========================================="
+              Write-Output "⏸️  No new commits detected after $pollDuration seconds"
+              Write-Output "Exiting workflow"
+              Write-Output "========================================="
+              exit 1
+            }
+          }
+
+          Write-Output ""
+          Write-Output "========================================="
+          Write-Output "❌ Workflow failed after $attempt attempts"
+          Write-Output "========================================="
+          exit 1
