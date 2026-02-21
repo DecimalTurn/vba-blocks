@@ -48,9 +48,7 @@ export async function checkForUpdate(): Promise<boolean> {
 			latestVersion = tag_name;
 		} else {
 			// npm distribution: check npm registry
-			const response = await fetch(
-				`https://registry.npmjs.org/${NPM_PACKAGE_NAME}/latest`
-			);
+			const response = await fetch(`https://registry.npmjs.org/${NPM_PACKAGE_NAME}/latest`);
 			const data: any = await response.json();
 			latestVersion = data.version;
 		}

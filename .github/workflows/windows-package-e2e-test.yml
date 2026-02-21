@@ -6,6 +6,7 @@ on:
       - main*
       - dev
       - dev-*
+      - dual-output
     paths-ignore:
       - '**/*.md'
   pull_request:
