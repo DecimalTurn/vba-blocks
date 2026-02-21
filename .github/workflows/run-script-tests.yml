@@ -45,14 +45,15 @@ jobs:
           Write-Output "PASS"
 
           # -------------------------------------------------------
-          # Dot-source only the helper functions from run.ps1.
-          # The script calls "Run …; exit 0" at the top level, so we
-          # extract and evaluate ONLY the function/class definitions.
+          # Dot-source only the function/class definitions from run.ps1.
+          # The script has: param block → main body → exit 0 → definitions.
+          # We extract everything after "exit 0" which is only definitions.
           # -------------------------------------------------------
           $scriptContent = Get-Content $script -Raw
 
           # Extract everything from the first 'function ' or 'class ' keyword
-          # to the end of the file – this skips the top-level param/logic.
+          # to the end of the file – this skips the top-level param/logic
+          # (which ends with "exit 0" before the definitions begin).
           $defStart = [regex]::Match($scriptContent, '(?m)^(function |class )')
           if (!$defStart.Success) {
             throw "Could not locate function/class definitions in run.ps1"
@@ -61,6 +62,24 @@ jobs:
 
           # Evaluate the definitions in the current scope
           Invoke-Expression $definitions
+
+          # -------------------------------------------------------
+          # Test: No parameter named $Args (regression guard)
+          # Using $Args as a parameter name conflicts with the
+          # PowerShell automatic variable and can silently become
+          # an empty array, breaking COM calls.
+          # -------------------------------------------------------
+          Write-Output "`n=== Test: No parameter named `$Args ==="
+          $content = Get-Content $script -Raw
+          # Match param declarations like [string[]]$Args or [object]$Args
+          if ($content -match '\$Args\b' -and $content -notmatch '\$MacroArgs\b.*\$Args') {
+            # More precise check: look for $Args in param() blocks
+            $paramMatches = [regex]::Matches($content, '(?m)^\s+\[.*\]\$Args\b')
+            if ($paramMatches.Count -gt 0) {
+              throw "Found parameter named `$Args in run.ps1. This conflicts with the PowerShell automatic variable. Use a different name (e.g. `$MacroArgValues)."
+            }
+          }
+          Write-Output "PASS"
 
           # -------------------------------------------------------
           # Test: Unescape
