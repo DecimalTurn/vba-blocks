@@ -80,22 +80,24 @@ export async function run(
 	macro: string,
 	args: string[] = []
 ): Promise<RunResult> {
-	let result;
+	let result: RunResult;
 	try {
 		result = await _run(application, file, macro, args);
 
 		// Give Office time to clean up
 		await wait(500);
 	} catch (err) {
-		result = err.result;
+		const cause = err as { result?: RunResult };
+		if (!cause.result) throw err;
+		result = cause.result;
 	}
 
 	return result;
 }
 
 async function wait(ms: number) {
-	return new Promise(resolve => {
-		setTimeout(() => resolve(), ms);
+	return new Promise<void>(resolve => {
+		setTimeout(resolve, ms);
 	});
 }
 
