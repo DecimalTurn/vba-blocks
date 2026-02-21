@@ -10,8 +10,8 @@ const node_version = "v22.22.0";
 
 // Node.js dropped win-x86 binaries after v22.x. For v23+, use win-x64 only.
 function getWindowsArch(version) {
-	const major = parseInt(version.replace(/^v/, '').split('.')[0], 10);
-	return major >= 23 ? 'x64' : 'x86';
+	const major = parseInt(version.replace(/^v/, "").split(".")[0], 10);
+	return major >= 23 ? "x64" : "x86";
 }
 const vendor = join(__dirname, "../vendor");
 const version = join(vendor, ".version");
@@ -31,12 +31,12 @@ async function downloadNode() {
 
 	if (previous_version === node_version) return;
 
-	       const base = `https://nodejs.org/dist/${node_version}/`;
-	       const winArch = getWindowsArch(node_version);
-	       const windows = `node-${node_version}-win-${winArch}.zip`;
-	       const mac = `node-${node_version}-darwin-x64.tar.gz`;
+	const base = `https://nodejs.org/dist/${node_version}/`;
+	const winArch = getWindowsArch(node_version);
+	const windows = `node-${node_version}-win-${winArch}.zip`;
+	const mac = `node-${node_version}-darwin-x64.tar.gz`;
 
-	       console.log(`Downloading node ${node_version} (win-${winArch}, mac-x64)...`);
+	console.log(`Downloading node ${node_version} (win-${winArch}, mac-x64)...`);
 
 	const dir = await tmpDir();
 	await Promise.all([
@@ -44,27 +44,27 @@ async function downloadNode() {
 		download(`${base}${mac}`, join(dir, mac))
 	]);
 
-	       console.log("Unzipping node");
+	console.log("Unzipping node");
 
-	       const filename = (file) => {
-		       file.path = basename(file.path);
-		       return file;
-	       };
+	const filename = file => {
+		file.path = basename(file.path);
+		return file;
+	};
 
-	       await ensureDir(vendor);
-	       await Promise.all([
-		       decompress(join(dir, windows), vendor, {
-			       filter: (file) => /node\.exe$/.test(file.path),
-			       map: filename,
-		       }),
-		       decompress(join(dir, mac), vendor, {
-			       filter: (file) => /node$/.test(file.path),
-			       map: filename,
-		       }),
-	       ]);
+	await ensureDir(vendor);
+	await Promise.all([
+		decompress(join(dir, windows), vendor, {
+			filter: file => /node\.exe$/.test(file.path),
+			map: filename
+		}),
+		decompress(join(dir, mac), vendor, {
+			filter: file => /node$/.test(file.path),
+			map: filename
+		})
+	]);
 
-	       await remove(dir);
-	       await writeFile(join(vendor, ".version"), node_version);
+	await remove(dir);
+	await writeFile(join(vendor, ".version"), node_version);
 }
 
 async function download(url, dest) {
