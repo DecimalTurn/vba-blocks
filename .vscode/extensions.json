@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "wxzhang.json-comments"
+        "wxzhang.json-comments",
+        "tamasfe.even-better-toml"
     ]
 }
