@@ -11,7 +11,5 @@ export interface HashOptions {
 export function hash(data: Buffer, options: HashOptions = {}): string {
 	const { algorithm = "sha256", digest = "hex" } = options;
 
-	return createHash(algorithm)
-		.update(data)
-		.digest(digest);
+	return createHash(algorithm).update(data).digest(digest);
 }

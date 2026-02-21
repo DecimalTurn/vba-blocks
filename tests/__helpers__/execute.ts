@@ -100,8 +100,5 @@ async function wait(ms: number) {
 }
 
 function normalize(value: string): string {
-	return value
-		.replace(/\r/g, "{CR}")
-		.replace(/\n/g, "{LF}")
-		.replace(/\t/g, "{tab}");
+	return value.replace(/\r/g, "{CR}").replace(/\n/g, "{LF}").replace(/\t/g, "{tab}");
 }
