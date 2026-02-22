@@ -1,4 +1,5 @@
 import dedent from "@timhall/dedent";
+import { existsSync, renameSync, unlinkSync } from "fs";
 import { env } from "../env";
 import { CliError, ErrorCode } from "../errors";
 import { Dependency, RegistryDependency } from "../manifest/dependency";
@@ -114,10 +115,16 @@ export class RegistrySource implements Source {
 
 		// Normalize legacy manifest name: packages published before the rename
 		// contain vba-block.toml; rename it so only vbaproject.toml exists.
+		// Uses native fs (not the mockable wrapper) because unzip writes real
+		// files to disk, so the cleanup must also operate on real disk.
 		const legacyManifest = join(src, "vba-block.toml");
 		const newManifest = join(src, "vbaproject.toml");
-		if ((await pathExists(legacyManifest)) && !(await pathExists(newManifest))) {
-			await move(legacyManifest, newManifest);
+		if (existsSync(legacyManifest)) {
+			if (existsSync(newManifest)) {
+				unlinkSync(legacyManifest);
+			} else {
+				renameSync(legacyManifest, newManifest);
+			}
 		}
 
 		return src;
