@@ -149,12 +149,14 @@ jobs:
           # Test: Fail produces expected JSON and exits with code 1
           # -------------------------------------------------------
           Write-Output "`n=== Test: Fail outputs JSON error ==="
+          # Write definitions to a temp file to avoid quoting/escaping issues
+          # when passing code containing double quotes to a child pwsh process
+          $defFile = Join-Path $env:TEMP "run_definitions.ps1"
+          Set-Content -Path $defFile -Value $definitions -Encoding UTF8
           # Run Fail in a child process so exit 1 doesn't kill this test
           $output = pwsh -NoProfile -Command @"
             `$ErrorActionPreference = 'Stop'
-            . {
-              $($definitions -replace '"','\"')
-            }
+            . '$defFile'
             Fail 'ERROR #99: test error'
           "@ 2>&1 | Out-String
 
@@ -172,9 +174,7 @@ jobs:
           Write-Output "`n=== Test: PrintLn ==="
           $output = pwsh -NoProfile -Command @"
             `$ErrorActionPreference = 'Stop'
-            . {
-              $($definitions -replace '"','\"')
-            }
+            . '$defFile'
             PrintLn 'hello from bridge'
           "@ 2>&1 | Out-String
 
