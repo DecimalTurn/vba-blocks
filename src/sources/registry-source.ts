@@ -112,6 +112,14 @@ export class RegistrySource implements Source {
 		await ensureDir(src);
 		await unzip(file, src);
 
+		// Normalize legacy manifest name: packages published before the rename
+		// contain vba-block.toml; rename it so only vbaproject.toml exists.
+		const legacyManifest = join(src, "vba-block.toml");
+		const newManifest = join(src, "vbaproject.toml");
+		if ((await pathExists(legacyManifest)) && !(await pathExists(newManifest))) {
+			await move(legacyManifest, newManifest);
+		}
+
 		return src;
 	}
 

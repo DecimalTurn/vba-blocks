@@ -15,9 +15,6 @@
 *.[lL][aA][cC][cC][dD][bB]
 *.[lL][dD][bB]
 
-# Test artifacts: packages extracted from registry archives still use old manifest name
-tests/__fixtures__/.vbapm/sources/**/vba-block.toml
-
 # OS and other
 .env
 .DS_Store
