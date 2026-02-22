@@ -49,13 +49,17 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $standaloneDir = Join-Path $env:APPDATA "vbapm"
           $binDir = Join-Path $standaloneDir "bin"
+          $libDir = Join-Path $standaloneDir "lib"
 
           New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $libDir | Out-Null
 
-          # Copy bin scripts to simulate a standalone installation
+          # Copy bin scripts and lib to simulate a standalone installation
           Copy-Item "bin\*" $binDir -Force
+          Copy-Item "lib\*" $libDir -Force
           Write-Output "Standalone install simulated at: $standaloneDir"
           Get-ChildItem $binDir
+          Get-ChildItem $libDir
 
       # ---------------------------------------------------------------
       # Install as npm global package
@@ -120,8 +124,11 @@ jobs:
 
           $standaloneDir = Join-Path $env:APPDATA "vbapm"
           $binDir = Join-Path $standaloneDir "bin"
+          $libDir = Join-Path $standaloneDir "lib"
           New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $libDir | Out-Null
           Copy-Item "bin\*" $binDir -Force
+          Copy-Item "lib\*" $libDir -Force
 
           # Add standalone bin to PATH for this step and subsequent steps
           $env:Path += ";$binDir"
