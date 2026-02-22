@@ -82,9 +82,9 @@ export function checkDualInstall(): string | undefined {
 			"vbapm is installed both as a standalone CLI and as an npm global package.",
 			"This may cause version conflicts. Consider removing one:",
 			IS_STANDALONE
-				? '  - To remove the npm copy: npm uninstall -g vbapm'
-				: '  - To remove the standalone copy: delete the vbapm folder from ' +
-					(env.isWindows ? '%APPDATA%\\vbapm' : '~/.vbapm')
+				? "  - To remove the npm copy: npm uninstall -g vbapm"
+				: "  - To remove the standalone copy: delete the vbapm folder from " +
+					(env.isWindows ? "%APPDATA%\\vbapm" : "~/.vbapm")
 		].join("\n");
 	}
 
