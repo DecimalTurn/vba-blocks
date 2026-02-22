@@ -52,6 +52,10 @@
     "jest": {
         "preset": "ts-jest",
         "testEnvironment": "node",
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "/lib/"
+        ],
         "moduleNameMapper": {
             "^@timhall/dedent$": "<rootDir>/node_modules/@timhall/dedent/dist/dedent.js"
         },

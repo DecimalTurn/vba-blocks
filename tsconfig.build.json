@@ -8,5 +8,5 @@
     "useUnknownInCatchVariables": false
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "tests/**/*.ts", "src/**/__mocks__/*", "src/**/__helpers__/*"]
+  "exclude": ["node_modules", "tests/**/*.ts", "src/**/__mocks__/*", "src/**/__helpers__/*", "src/**/__tests__/*"]
 }
