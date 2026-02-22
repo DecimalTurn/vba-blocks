@@ -2,7 +2,7 @@ import { join, normalize } from "../../src/utils/path";
 
 export const dir = normalize(__dirname);
 
-export const cache = join(dir, ".vba-blocks");
+export const cache = join(dir, ".vbapm");
 export const sources = join(cache, "sources");
 
 export const projects = join(dir, "projects");
