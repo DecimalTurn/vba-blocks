@@ -31,7 +31,10 @@ async function main() {
 	assert(await pathExists(dir), `Input directory "${input}" not found`);
 
 	const manifest_path = join(dir, "vbaproject.toml");
-	assert(await pathExists(manifest_path), `vbaproject.toml not found in input directory "${input}"`);
+	assert(
+		await pathExists(manifest_path),
+		`vbaproject.toml not found in input directory "${input}"`
+	);
 
 	const manifest = parse(await readFile(manifest_path, "utf8"));
 	assert(manifest.package, `publish only supports packages ([package] in vbaproject.toml)`);

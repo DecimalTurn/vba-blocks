@@ -198,7 +198,9 @@ async function prepareDivergedRegistry(cache: string): Promise<void> {
 	await runCommand(`git -C "${cache}" config user.email "vbapm@local"`);
 	await writeFile(join(cache, "cat.txt"), "meow\n", "utf8");
 	await runCommand(`git -C "${cache}" add cat.txt`);
-	await runCommand(`git -C "${cache}" commit -m "test: add cat.txt for registry recovery scenario"`);
+	await runCommand(
+		`git -C "${cache}" commit -m "test: add cat.txt for registry recovery scenario"`
+	);
 }
 
 async function restoreRegistry(cache: string): Promise<void> {

@@ -41,8 +41,6 @@ describe("utils", () => {
 	});
 
 	test("should get source path", () => {
-		expect(getSource(".vbapm/sources", dictionary)).toEqual(
-			".vbapm/sources/dictionary-v1.0.0"
-		);
+		expect(getSource(".vbapm/sources", dictionary)).toEqual(".vbapm/sources/dictionary-v1.0.0");
 	});
 });
