@@ -30,11 +30,11 @@ async function main() {
 	const dir = resolve(input);
 	assert(await pathExists(dir), `Input directory "${input}" not found`);
 
-	const manifest_path = join(dir, "vba-block.toml");
-	assert(await pathExists(manifest_path), `vba-block.toml not found in input directory "${input}"`);
+	const manifest_path = join(dir, "vbaproject.toml");
+	assert(await pathExists(manifest_path), `vbaproject.toml not found in input directory "${input}"`);
 
 	const manifest = parse(await readFile(manifest_path, "utf8"));
-	assert(manifest.package, `publish only supports packages ([package] in vba-block.toml)`);
+	assert(manifest.package, `publish only supports packages ([package] in vbaproject.toml)`);
 
 	const cksum = await uploadAndValidate(dir, manifest, { dryrun });
 	const entry = generateEntry(manifest, cksum);
