@@ -8,10 +8,27 @@
         "Tim Hall <tim.hall.engr@gmail.com> (https://github.com/timhall)"
     ],
     "license": "MIT",
-    "bin": "lib/vbapm.js",
+    "bin": {
+        "vbapm": "lib/vbapm.js",
+        "vba": "lib/vbapm.js"
+    },
     "main": "lib/index.js",
+    "types": "lib/src/index.d.ts",
+    "exports": {
+        ".": {
+            "require": "./lib/index.js",
+            "types": "./lib/src/index.d.ts"
+        }
+    },
+    "files": [
+        "lib/",
+        "addins/build/",
+        "run-scripts/",
+        "LICENSE",
+        "README.md"
+    ],
     "engines": {
-        "node": "^22.0.0"
+        "node": ">=18.0.0"
     },
     "scripts": {
         "format": "prettier --write \"**/*.{ts,js}\"",
@@ -19,13 +36,15 @@
         "test": "jest --runInBand",
         "typecheck": "tsc",
         "deps": "npm i",
-        "dev": "run-s deps typecheck format:check test build",
+        "dev": "run-s deps typecheck format:check test build:standalone",
         "test:e2e": "jest --config e2e.config.js --runInBand",
-        "build": "rimraf lib && rollup -c && node scripts/ensure-vendor",
+        "build": "rimraf lib && rollup -c && tsc -p tsconfig.build.json",
+        "build:standalone": "npm run build && node scripts/ensure-vendor",
         "build:dev": "cross-env NODE_ENV=development rollup -c",
         "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
         "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vbapm build",
-        "version": "npm run build && npm run build:addins && node scripts/ensure-vendor && node scripts/create-packages",
+        "prepublishOnly": "npm run build",
+        "version": "npm run build:standalone && npm run build:addins && node scripts/create-packages",
         "postversion": "git push && git push --tags",
         "release": "node scripts/release",
         "clean": "rimraf lib && rimraf dist && rimraf addins/build"
@@ -109,11 +128,13 @@
             "scripts.test": "Runs Jest tests in a single thread",
             "scripts.typecheck": "Runs the TypeScript compiler to check for type errors",
             "scripts.test:e2e": "Runs end-to-end tests using a specific Jest configuration",
-            "scripts.build": "Cleans the lib directory, builds the project using Rollup, and ensures vendor files are included",
+            "scripts.build": "Core build: rollup bundle + .d.ts generation (used by both npm and standalone channels)",
+            "scripts.build:standalone": "Full standalone build: core build + fetch vendored Node binary",
             "scripts.build:dev": "Allows to quickly rebuild the project in development mode with environment variables set for easier debugging of the js/ts code",
             "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
             "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
-            "scripts.version": "Prepares a new version by building the project, building add-ins, ensuring vendor files, and creating packages",
+            "scripts.prepublishOnly": "Ensures lib/ is fresh before npm publish",
+            "scripts.version": "Standalone release: build everything + create platform archives for GitHub releases",
             "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
             "scripts.release": "Runs a custom release script to publish the new version",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
