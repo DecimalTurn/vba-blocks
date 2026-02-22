@@ -133,18 +133,25 @@ export function parseManifest(value: any, dir: string): Manifest {
 }
 
 export async function loadManifest(dir: string): Promise<Manifest> {
-	const file = join(dir, "vbaproject.toml");
+	let file = join(dir, "vbaproject.toml");
 
 	if (!(await pathExists(file))) {
-		throw new CliError(
-			ErrorCode.ManifestNotFound,
-			dedent`
-        vbaproject.toml not found in "${dir}".
+		// Fallback to legacy manifest name for backward compatibility
+		// (e.g. packages downloaded from registry that still use vba-block.toml)
+		const legacyFile = join(dir, "vba-block.toml");
+		if (await pathExists(legacyFile)) {
+			file = legacyFile;
+		} else {
+			throw new CliError(
+				ErrorCode.ManifestNotFound,
+				dedent`
+          vbaproject.toml not found in "${dir}".
 
-        Try "vbapm init" to start a new project in this directory
-        or "cd YOUR_PROJECTS_DIRECTORY" to change to a folder that contains an existing project.
-      `
-		);
+          Try "vbapm init" to start a new project in this directory
+          or "cd YOUR_PROJECTS_DIRECTORY" to change to a folder that contains an existing project.
+        `
+			);
+		}
 	}
 
 	const raw = await readFile(file);
