@@ -1,4 +1,5 @@
 import { differenceInCalendarDays } from "date-fns";
+import { existsSync } from "fs";
 import { gt as semverGreaterThan } from "semver";
 import { version as currentVersion } from "../package.json";
 import { cache } from "./cache";
@@ -6,6 +7,10 @@ import { env } from "./env";
 import { getLatestRelease } from "./utils/github";
 
 const debug = env.debug("vbapm:installer");
+
+// When installed via npm, the bin/ directory doesn't exist inside
+// node_modules/vbapm/. When running as standalone, it does.
+const IS_STANDALONE = existsSync(env.bin);
 
 export function updateVersion(): string | undefined {
 	return cache.latest_version;
@@ -18,6 +23,9 @@ export function updateAvailable(): boolean {
 }
 
 export async function checkForUpdate(): Promise<boolean> {
+	// npm users manage their own updates via npm update
+	if (!IS_STANDALONE) return false;
+
 	// Only check for new version once per day
 	const lastChecked = cache.latest_version_checked;
 	if (lastChecked && differenceInCalendarDays(new Date(lastChecked), Date.now()) < 1)
