@@ -1,4 +1,5 @@
 import { readFile as _readFile, symlink as _symlink, writeFile as _writeFile } from "fs";
+import { isAbsolute } from "path";
 import { copy } from "fs-extra/lib/copy";
 import { emptyDir } from "fs-extra/lib/empty";
 import { readJson } from "fs-extra/lib/json/jsonfile";
@@ -28,11 +29,23 @@ async function tmpFile(options: TmpOptions = {}): Promise<string> {
 	const { env } = await import("../env");
 	const { file: tmpFile } = await import("tmp");
 	const { dir = env.temp, prefix, template } = options;
+	const tmpOptions: {
+		dir?: string;
+		tmpdir?: string;
+		prefix?: string;
+		template?: string;
+	} = { prefix, template };
+
+	if (isAbsolute(dir)) {
+		tmpOptions.tmpdir = dir;
+	} else {
+		tmpOptions.dir = dir;
+	}
 
 	await ensureDir(dir);
 	return new Promise<string>((resolve, reject) => {
 		// Defer requiring tmp as it adds process listeners that can cause warnings
-		tmpFile({ prefix, dir, template }, (err: any, path: string) => {
+		tmpFile(tmpOptions, (err: any, path: string) => {
 			if (err) return reject(err);
 			resolve(path);
 		});
@@ -43,10 +56,22 @@ async function tmpFolder(options: TmpOptions = {}): Promise<string> {
 	const { env } = await import("../env");
 	const { dir: tmpDir } = await import("tmp");
 	const { dir = env.temp, prefix, template } = options;
+	const tmpOptions: {
+		dir?: string;
+		tmpdir?: string;
+		prefix?: string;
+		template?: string;
+	} = { prefix, template };
+
+	if (isAbsolute(dir)) {
+		tmpOptions.tmpdir = dir;
+	} else {
+		tmpOptions.dir = dir;
+	}
 
 	await ensureDir(dir);
 	return new Promise<string>((resolve, reject) => {
-		tmpDir({ prefix, dir, template }, (err: any, path: string) => {
+		tmpDir(tmpOptions, (err: any, path: string) => {
 			if (err) return reject(err);
 			resolve(path);
 		});
