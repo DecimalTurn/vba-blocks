@@ -5,5 +5,9 @@ case `uname` in
   *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
 esac
 
-"$basedir/../vendor/node" --no-warnings "$basedir/../lib/vbapm.js" "$@"
+if [ -x "$basedir/../vendor/node" ]; then
+  "$basedir/../vendor/node" --no-warnings "$basedir/../lib/vbapm.js" "$@"
+else
+  node --no-warnings "$basedir/../lib/vbapm.js" "$@"
+fi
 exit $?

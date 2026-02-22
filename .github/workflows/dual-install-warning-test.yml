@@ -1,0 +1,149 @@
+name: Dual Install Warning Test
+
+on:
+  push:
+    branches:
+      - main*
+      - dev
+      - dev-*
+    paths:
+      - 'src/installer.ts'
+      - 'src/bin/vbapm.ts'
+      - 'bin/**'
+      - '.github/workflows/dual-install-warning-test.yml'
+  pull_request:
+    paths:
+      - 'src/installer.ts'
+      - 'src/bin/vbapm.ts'
+      - 'bin/**'
+      - '.github/workflows/dual-install-warning-test.yml'
+  workflow_dispatch:
+
+jobs:
+  dual-install-warning:
+    strategy:
+      matrix:
+        os: [windows-2025]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build:lib
+
+      # ---------------------------------------------------------------
+      # Simulate standalone CLI install (%APPDATA%\vbapm\bin\)
+      # ---------------------------------------------------------------
+      - name: Simulate standalone CLI install
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $standaloneDir = Join-Path $env:APPDATA "vbapm"
+          $binDir = Join-Path $standaloneDir "bin"
+          $libDir = Join-Path $standaloneDir "lib"
+
+          New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $libDir | Out-Null
+
+          # Copy bin scripts and lib to simulate a standalone installation
+          Copy-Item "bin\*" $binDir -Force
+          Copy-Item "lib\*" $libDir -Force
+          Write-Output "Standalone install simulated at: $standaloneDir"
+          Get-ChildItem $binDir
+          Get-ChildItem $libDir
+
+      # ---------------------------------------------------------------
+      # Install as npm global package
+      # ---------------------------------------------------------------
+      - name: Install npm global package
+        shell: pwsh
+        run: |
+          npm install -g .
+          Write-Output "npm global prefix: $(npm prefix -g)"
+          Write-Output "npm global vbapm location:"
+          Get-ChildItem (Join-Path (npm prefix -g) "node_modules\vbapm") -Name
+
+      # ---------------------------------------------------------------
+      # Test: vba --version shows dual-install warning when both exist
+      # ---------------------------------------------------------------
+      - name: Verify dual-install warning appears in CLI output
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # vba --version writes the version to stdout and the warning to stderr
+          $output = vba --version 2>&1 | Out-String
+          Write-Output "CLI output:"
+          Write-Output $output
+
+          if ($output -notmatch 'installed both') {
+            throw "FAIL: Expected dual-install warning in CLI output"
+          }
+          Write-Output "PASS: Dual-install warning detected in CLI output"
+
+      # ---------------------------------------------------------------
+      # Test: no warning with only npm
+      # ---------------------------------------------------------------
+      - name: Remove standalone install
+        shell: pwsh
+        run: |
+          $standaloneDir = Join-Path $env:APPDATA "vbapm"
+          if (Test-Path $standaloneDir) {
+            Remove-Item $standaloneDir -Recurse -Force
+          }
+          Write-Output "Standalone install removed"
+
+      - name: Verify no warning with npm-only install
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = vba --version 2>&1 | Out-String
+          Write-Output "CLI output:"
+          Write-Output $output
+
+          if ($output -match 'installed both') {
+            throw "FAIL: Unexpected dual-install warning with npm-only install"
+          }
+          Write-Output "PASS: No warning with npm-only install"
+
+      # ---------------------------------------------------------------
+      # Test: no warning with only standalone
+      # ---------------------------------------------------------------
+      - name: Remove npm global and re-add standalone
+        shell: pwsh
+        run: |
+          npm uninstall -g vbapm
+
+          $standaloneDir = Join-Path $env:APPDATA "vbapm"
+          $binDir = Join-Path $standaloneDir "bin"
+          $libDir = Join-Path $standaloneDir "lib"
+          New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $libDir | Out-Null
+          Copy-Item "bin\*" $binDir -Force
+          Copy-Item "lib\*" $libDir -Force
+
+          # Add standalone bin to PATH for this step and subsequent steps
+          $env:Path += ";$binDir"
+          $binDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          Write-Output "Standalone re-installed, npm removed"
+
+      - name: Verify no warning with standalone-only install
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = vba --version 2>&1 | Out-String
+          Write-Output "CLI output:"
+          Write-Output $output
+
+          if ($output -match 'installed both') {
+            throw "FAIL: Unexpected dual-install warning with standalone-only install"
+          }
+          Write-Output "PASS: No warning with standalone-only install"

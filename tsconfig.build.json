@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "lib",
+    "emitDeclarationOnly": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "tests/**/*.ts", "src/**/__mocks__/*", "src/**/__helpers__/*", "src/**/__tests__/*"]
+}

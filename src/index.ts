@@ -7,6 +7,7 @@ export { testProject } from "./actions/test-project";
 export { addins } from "./addin";
 export { loadConfig } from "./config";
 export { env } from "./env";
+export { checkDualInstall } from "./installer";
 export { parseManifest } from "./manifest";
 export { loadWorkspace } from "./professional/workspace";
 export { fetchDependencies, loadProject } from "./project";

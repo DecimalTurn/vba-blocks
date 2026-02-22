@@ -1,11 +1,12 @@
 import dedent from "@timhall/dedent";
-import { greenBright, redBright } from "@timhall/ansi-colors";
+import { greenBright, redBright, yellowBright } from "@timhall/ansi-colors";
+import { existsSync } from "fs";
 import meant from "meant";
 import mri, { Args } from "mri";
 import { version } from "../../package.json";
 import { env } from "../env";
 import { cleanError, CliError, ErrorCode, isCliError } from "../errors";
-import { checkForUpdate, updateAvailable, updateVersion } from "../installer";
+import { checkForUpdate, checkDualInstall, updateAvailable, updateVersion } from "../installer";
 import { Message } from "../messages";
 import { isRunError } from "../utils/run";
 import { joinCommas } from "../utils/text";
@@ -64,11 +65,21 @@ const help = dedent`
   Use 'vbapm help COMMAND' for help on specific commands.
   Visit https://vba-blocks.com to learn more about vbapm.`;
 
-const updateAvailableMessage = () => dedent`
-  \n${greenBright("New Update!")} ${updateVersion()!}
+const updateAvailableMessage = () => {
+	const isStandalone = existsSync(env.bin);
+	if (isStandalone) {
+		return dedent`
+		  \n${greenBright("New Update!")} ${updateVersion()!}
 
-  A new version of vbapm is available.
-  Visit https://vba-blocks.com/update for more information.`;
+		  A new version of vbapm is available.
+		  Visit https://vba-blocks.com/update for more information.`;
+	}
+	return dedent`
+	  \n${greenBright("New Update!")} ${updateVersion()!}
+
+	  A new version of vbapm is available.
+	  Run "npm update -g vbapm" to update.`;
+};
 
 process.title = "vbapm";
 process.on("unhandledRejection", handleError);
@@ -91,6 +102,7 @@ async function main() {
 			}
 		}
 
+		warnIfDualInstall();
 		return;
 	}
 
@@ -142,6 +154,15 @@ async function main() {
 
 	if (has_update_available) {
 		env.reporter.log(Message.UpdateAvailable, updateAvailableMessage());
+	}
+
+	warnIfDualInstall();
+}
+
+function warnIfDualInstall() {
+	const dualInstallWarning = checkDualInstall();
+	if (dualInstallWarning) {
+		console.warn(`\n${yellowBright("Warning:")} ${dualInstallWarning}`);
 	}
 }
 
