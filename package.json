@@ -43,9 +43,6 @@
         "build:dev": "cross-env NODE_ENV=development rollup -c",
         "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
         "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vbapm build",
-        "prepublishOnly": "npm run build:lib",
-        "version": "npm run build:cli && npm run build:addins && node scripts/create-packages",
-        "postversion": "git push && git push --tags",
         "clean": "rimraf lib && rimraf dist && rimraf addins/build"
     },
     "jest": {
@@ -133,9 +130,6 @@
             "scripts.build:dev": "Allows to quickly rebuild the project in development mode with environment variables set for easier debugging of the js/ts code",
             "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
             "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
-            "scripts.prepublishOnly": "Ensures lib/ is fresh before npm publish",
-            "scripts.version": "Standalone release: build everything + create platform archives for GitHub releases",
-            "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
             "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts",
             "overrides": "Pins vulnerable transitive dependencies to patched versions to remove critical npm audit findings without large upstream upgrades.",
