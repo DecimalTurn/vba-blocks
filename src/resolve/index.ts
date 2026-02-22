@@ -8,7 +8,7 @@ import { DependencyGraph, getRegistration } from "./dependency-graph";
 import { solveLatest } from "./latest-solver";
 import { Resolver } from "./resolver";
 
-const debug = env.debug("vba-blocks:resolve");
+const debug = env.debug("vbapm:resolve");
 
 export { getRegistration, Resolver };
 

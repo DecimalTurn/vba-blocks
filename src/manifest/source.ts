@@ -16,7 +16,7 @@ export interface Source {
 	binary?: string;
 }
 
-const EXAMPLE = `Example vba-block.toml:
+const EXAMPLE = `Example vbaproject.toml:
 
   [src]
   A = "src/a.bas"

@@ -6,7 +6,7 @@ export function getStaging(cache: string): string {
 	const staging =
 		process.platform === "win32"
 			? join(cache, "staging")
-			: join(findMacOfficeContainer(), ".vba-blocks");
+			: join(findMacOfficeContainer(), ".vbapm");
 	ensureDirSync(staging);
 
 	return staging;

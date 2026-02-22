@@ -1,6 +1,6 @@
 import { copy, ensureDirSync, readFile, remove } from "fs-extra";
 import { promisify } from "util";
-import { run as _run } from "vba-blocks";
+import { run as _run } from "vbapm";
 import walkSync from "walk-sync";
 import { tmpFolder } from "../../src/utils/fs";
 import { basename, extname, join, resolve } from "../../src/utils/path";
@@ -67,7 +67,7 @@ export async function readdir(cwd: string): Promise<{ [path: string]: string }> 
 			details[file] = "<TODO>";
 		} else {
 			const data = await readFile(resolve(cwd, file), "utf8");
-			details[file] = basename(file) === "vba-block.toml" ? data : truncate(normalize(data), 200);
+			details[file] = basename(file) === "vbaproject.toml" ? data : truncate(normalize(data), 200);
 		}
 	}
 

@@ -25,13 +25,13 @@ export async function runMacro(options: RunOptions): Promise<RunResult> {
 	if (!file) {
 		throw new CliError(
 			ErrorCode.RunMissingFile,
-			`file is required for vba-blocks run (e.g. vba-blocks run --file FILE <macro> <arg>...).`
+			`file is required for vbapm run (e.g. vbapm run --file FILE <macro> <arg>...).`
 		);
 	}
 	if (!macro) {
 		throw new CliError(
 			ErrorCode.RunMissingMacro,
-			`macro is required for vba-blocks run (e.g. vba-blocks run --file FILE <macro> <arg>...).`
+			`macro is required for vbapm run (e.g. vbapm run --file FILE <macro> <arg>...).`
 		);
 	}
 

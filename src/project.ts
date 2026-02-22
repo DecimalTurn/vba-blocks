@@ -10,7 +10,7 @@ import { tmpFolder } from "./utils/fs";
 import { parallel } from "./utils/parallel";
 import { join, normalize } from "./utils/path";
 
-const debug = env.debug("vba-blocks:project");
+const debug = env.debug("vbapm:project");
 
 export interface Project {
 	manifest: Manifest;

@@ -34,7 +34,7 @@ async function main() {
 		owner: "vba-blocks",
 		repo: "vba-blocks",
 		tag_name: tag,
-		name: `vba-blocks v${version}`,
+		name: `vbapm v${version}`,
 		body,
 		prerelease,
 		draft
@@ -42,8 +42,8 @@ async function main() {
 
 	console.log("Uploading packages");
 	await Promise.all([
-		uploadAsset(join(__dirname, "../dist", `vba-blocks-win.zip`), release),
-		uploadAsset(join(__dirname, "../dist", `vba-blocks-mac.tar.gz`), release)
+		uploadAsset(join(__dirname, "../dist", `vbapm-win.zip`), release),
+		uploadAsset(join(__dirname, "../dist", `vbapm-mac.tar.gz`), release)
 	]);
 
 	console.log("Done!");

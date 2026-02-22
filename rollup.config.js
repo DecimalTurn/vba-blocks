@@ -11,7 +11,7 @@ const builtins = new Set(builtin);
 
 export default [
 	{
-		input: ["src/index.ts", "src/bin/vba-blocks.ts", "src/debug.ts"],
+		input: ["src/index.ts", "src/bin/vbapm.ts", "src/debug.ts"],
 		output: {
 			format: "cjs",
 			dir: "lib",

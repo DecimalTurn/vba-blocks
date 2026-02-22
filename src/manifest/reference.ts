@@ -34,7 +34,7 @@ const getMajorMinor = (version: string) => {
 	return { major, minor };
 };
 
-const EXAMPLE = `Example vba-block.toml:
+const EXAMPLE = `Example vbaproject.toml:
 
   [references.Scripting]
   version = "1.0"

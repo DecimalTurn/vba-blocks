@@ -1,4 +1,4 @@
-# vba-blocks
+# vbapm
 
 A package manager and build tool for VBA.
 
@@ -20,7 +20,7 @@ In terminal, run the following:
 curl -fsSL https://vba-blocks.com/install.sh | sh
 ```
 
-For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vba-blocks to work correctly:
+For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vbapm to work correctly:
 
 <details>
   <summary>Trust access to the VBA project object model</summary>
@@ -41,7 +41,7 @@ If you run into any issues during installation, please see the [known issues](ht
 
 ### `new`
 
-Create a new folder with a blank/generated vba-blocks project inside
+Create a new folder with a blank/generated vbapm project inside
 
 Create a folder "project-name" with a blank xlsm project:
 
@@ -69,7 +69,7 @@ vba new json-converter --package
 
 ### `init`
 
-Create a blank/generated vba-blocks project in the current folder
+Create a blank/generated vbapm project in the current folder
 
 Create a blank xlsm project with the current folder's name:
 
@@ -149,7 +149,7 @@ vba run Messages.SayHi Tim
 Howdy Tim!
 ```
 
-## Manifest (vba-block.toml)
+## Manifest (vbaproject.toml)
 
 ### [project] or [package]
 

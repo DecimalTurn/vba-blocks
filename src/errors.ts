@@ -78,7 +78,7 @@ export function manifestOk(value: any, message: string) {
 	const error = new CliError(
 		ErrorCode.ManifestInvalid,
 		dedent`
-      vba-blocks.toml is invalid:
+      vbaproject.toml is invalid:
 
       ${message}
     `

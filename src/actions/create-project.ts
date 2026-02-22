@@ -18,9 +18,9 @@ export async function createProject(options: CreateOptions) {
 		throw new CliError(
 			ErrorCode.NewNameRequired,
 			dedent`
-        "name" is required with vba-blocks new (e.g. vba-blocks new project-name).
+        "name" is required with vbapm new (e.g. vbapm new project-name).
 
-        Try "vba-blocks help new" for more information.
+        Try "vbapm help new" for more information.
       `
 		);
 	}
@@ -37,10 +37,10 @@ export async function createProject(options: CreateOptions) {
 		throw new CliError(
 			ErrorCode.NewTargetRequired,
 			dedent`
-        .TYPE, --target, or --from is required for vba-blocks projects.
-        (e.g. vba-blocks new project.name.TYPE)
+        .TYPE, --target, or --from is required for vbapm projects.
+        (e.g. vbapm new project.name.TYPE)
 
-        Try "vba-blocks help new" for more information.
+        Try "vbapm help new" for more information.
       `
 		);
 	}
