@@ -15,13 +15,13 @@ The approach used in this project to build VBA documents is to have a VBA addin 
 
 However, in order to build that VBA addin in our build pipeline, we need a way to build a VBA document! This is the classic chicken-and-egg problem. We solve it by including the latest version of Bootstrap.xlsm (`scripts/bootstrap/build/bootstrap.xlsm`) inside the repo such that this file can be used to build the VBA addin with the latest source code.
 
-Update flow for vba-blocks.xlam and bootstrap.xlsm
+Update flow for vbapm.xlam and bootstrap.xlsm
 ```mermaid
 flowchart LR
     A@{ shape: doc, label: "Original Bootstrap.xlsm workbook" }
     X1[Original addin source code `/addins`]
 
-    B@{ shape: doc, label: "Original vba-blocks.xlam addin" }
+    B@{ shape: doc, label: "Original vbapm.xlam addin" }
 
     A & X1 --> B1
     B1((build:addins))
@@ -39,7 +39,7 @@ flowchart LR
     X[🔄️Addin source code update `/addins`]
     B2((build:addin))
     A & X  --> B2
-    B2 --> BO@{ shape: doc, label: "Latest vba-blocks.xlam addin" }
+    B2 --> BO@{ shape: doc, label: "Latest vbapm.xlam addin" }
     X & BO --> B4((build:bootstrap))
     AF@{ shape: doc, label: "Latest Bootstrap.xlsm workbook" }
     B4 --> AF

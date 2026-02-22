@@ -18,14 +18,14 @@ async function main() {
 }
 
 async function windows() {
-	const file = join(dist, `vba-blocks-win.zip`);
+	const file = join(dist, `vbapm-win.zip`);
 	const input = getInput("win32");
 
 	await zip(input, file);
 }
 
 async function mac() {
-	const file = join(dist, `vba-blocks-mac.tar.gz`);
+	const file = join(dist, `vbapm-mac.tar.gz`);
 	const input = getInput("darwin");
 
 	await zip(input, file, "tar", { gzip: true });

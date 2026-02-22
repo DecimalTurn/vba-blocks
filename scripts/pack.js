@@ -6,7 +6,7 @@ const ls = require("./lib/ls");
 const zip = require("./lib/zip");
 const sanitizeName = require("./lib/sanitize-name");
 
-const IS_MANIFEST = /vba-block\.toml/;
+const IS_MANIFEST = /vbaproject\.toml/;
 const IS_README = /readme/i;
 const IS_CHANGELOG = /changes|changelog|history/i;
 const IS_LICENSE = /license|licence/i;
@@ -29,14 +29,14 @@ async function main() {
 		throw new Error(`Input directory "${input}" not found`);
 	}
 
-	const manifest_path = join(dir, "vba-block.toml");
+	const manifest_path = join(dir, "vbaproject.toml");
 	if (!(await pathExists(manifest_path))) {
-		throw new Error(`vba-block.toml not found in input directory "${input}"`);
+		throw new Error(`vbaproject.toml not found in input directory "${input}"`);
 	}
 
 	const manifest = parse(await readFile(manifest_path, "utf8"));
 	if (!manifest.package) {
-		throw new Error(`pack only supports packages ([package] in vba-block.toml)`);
+		throw new Error(`pack only supports packages ([package] in vbaproject.toml)`);
 	}
 
 	const { name, version } = manifest.package;

@@ -30,7 +30,7 @@ export { default as isLockfileValid } from "./is-lockfile-valid";
  * (for invalid lockfile, errors are ignored and treated as no lockfile)
  */
 export async function readLockfile(dir: string): Promise<Lockfile | null> {
-	const file = join(dir, "vba-block.lock");
+	const file = join(dir, "vbaproject.lock");
 	debug(`Reading lockfile from ${file}`);
 
 	if (!(await pathExists(file))) {
@@ -55,7 +55,7 @@ export async function readLockfile(dir: string): Promise<Lockfile | null> {
  * @throws LockfileWriteFailed
  */
 export async function writeLockfile(dir: string, project: Project): Promise<void> {
-	const file = join(dir, "vba-block.lock");
+	const file = join(dir, "vbaproject.lock");
 	debug(`Writing lockfile to ${file}`);
 
 	try {
@@ -104,7 +104,7 @@ export function toToml(project: Project, dir: string): string {
  */
 export async function fromToml(toml: string, dir: string): Promise<Lockfile> {
 	const parsed = await parseToml(toml);
-	ok(has(parsed, "root"), "vba-block.lock is missing [root] field");
+	ok(has(parsed, "root"), "vbaproject.lock is missing [root] field");
 
 	const metadata = parsed.metadata;
 

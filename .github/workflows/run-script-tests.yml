@@ -132,15 +132,15 @@ jobs:
           # Test: GetFileName  (= filename WITHOUT extension)
           # -------------------------------------------------------
           Write-Output "`n=== Test: GetFileName ==="
-          $result = GetFileName 'C:\Users\dev\addins\vba-blocks.xlam'
-          if ($result -ne 'vba-blocks') {
+          $result = GetFileName 'C:\Users\dev\addins\vbapm.xlam'
+          if ($result -ne 'vbapm') {
             throw "GetFileName failed: got '$result'"
           }
           Write-Output "PASS"
 
           Write-Output "`n=== Test: GetFileName forward slashes ==="
-          $result = GetFileName 'C:/addins/vba-blocks.xlam'
-          if ($result -ne 'vba-blocks') {
+          $result = GetFileName 'C:/addins/vbapm.xlam'
+          if ($result -ne 'vbapm') {
             throw "GetFileName forward-slash failed: got '$result'"
           }
           Write-Output "PASS"

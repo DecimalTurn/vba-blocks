@@ -43,15 +43,15 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          $libDir = Join-Path $env:APPDATA "vba-blocks"
+          $libDir = Join-Path $env:APPDATA "vbapm"
           $binDir = Join-Path $libDir "bin"
           $addinsDir = Join-Path $libDir "addins\build"
 
-          Write-Output "Installing vba-blocks from local build artifacts"
+          Write-Output "Installing vbapm from local build artifacts"
 
           New-Item -ItemType Directory -Force -Path $libDir | Out-Null
 
-          # Mirror packaged layout into %APPDATA%\vba-blocks (no zip extraction needed).
+          # Mirror packaged layout into %APPDATA%\vbapm (no zip extraction needed).
           $sources = @("bin", "lib", "vendor", "run-scripts", "addins")
           foreach ($source in $sources) {
             $sourcePath = Join-Path $PWD $source
@@ -68,7 +68,7 @@ jobs:
             Copy-Item $sourcePath $destPath -Recurse -Force
           }
 
-          Write-Output "[3/5] Adding vba-blocks to PATH..."
+          Write-Output "[3/5] Adding vbapm to PATH..."
           $user = [EnvironmentVariableTarget]::User
           $path = [Environment]::GetEnvironmentVariable('Path', $user)
           if (!((";$path;").ToLower() -like "*;$binDir;*".ToLower())) {
@@ -89,7 +89,7 @@ jobs:
           }
 
           Write-Output "[4/5] Creating shortcut to add-ins..."
-          New-Shortcut "$addinsDir" "$env:AppData\Microsoft\Addins\vba-blocks Add-ins.lnk"
+          New-Shortcut "$addinsDir" "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
 
           function Enable-VBOM ($app) {
             try {

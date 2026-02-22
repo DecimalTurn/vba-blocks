@@ -48,7 +48,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add scripts/bootstrap/build/bootstrap.xlsm scripts/bootstrap/vba-block.lock
+          git add scripts/bootstrap/build/bootstrap.xlsm scripts/bootstrap/vbaproject.lock
 
           if (git diff --staged --quiet) {
             Write-Output "No bootstrap changes detected."
