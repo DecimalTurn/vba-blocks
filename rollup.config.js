@@ -7,6 +7,7 @@ import { terser } from "rollup-plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
 const mode = process.env.NODE_ENV || "production";
+const builtins = new Set(builtin);
 
 export default [
 	{
@@ -17,7 +18,9 @@ export default [
 			sourcemap: true,
 			exports: "auto"
 		},
-		external: [...builtin],
+		external(id) {
+			return id === "archiver" || builtins.has(id) || id.startsWith("node:");
+		},
 		plugins: [
 			resolve(),
 			replace({
@@ -38,6 +41,9 @@ export default [
 		onwarn(warning, warn) {
 			// Ignore known errors
 			if (warning.code === "CIRCULAR_DEPENDENCY" && /glob/.test(warning.importer)) return;
+			if (warning.code === "CIRCULAR_DEPENDENCY" && /readable\-stream/.test(warning.importer || ""))
+				return;
+			if (warning.code === "UNRESOLVED_IMPORT" && /^node:/.test(warning.source || "")) return;
 			if (warning.code === "EVAL" && /minisat/.test(warning.id)) return;
 
 			warn(warning);
