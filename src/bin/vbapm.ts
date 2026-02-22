@@ -1,12 +1,12 @@
 import dedent from "@timhall/dedent";
-import { greenBright, redBright } from "@timhall/ansi-colors";
+import { greenBright, redBright, yellowBright } from "@timhall/ansi-colors";
 import { existsSync } from "fs";
 import meant from "meant";
 import mri, { Args } from "mri";
 import { version } from "../../package.json";
 import { env } from "../env";
 import { cleanError, CliError, ErrorCode, isCliError } from "../errors";
-import { checkForUpdate, updateAvailable, updateVersion } from "../installer";
+import { checkForUpdate, checkDualInstall, updateAvailable, updateVersion } from "../installer";
 import { Message } from "../messages";
 import { isRunError } from "../utils/run";
 import { joinCommas } from "../utils/text";
@@ -153,6 +153,11 @@ async function main() {
 
 	if (has_update_available) {
 		env.reporter.log(Message.UpdateAvailable, updateAvailableMessage());
+	}
+
+	const dualInstallWarning = checkDualInstall();
+	if (dualInstallWarning) {
+		console.warn(`\n${yellowBright("Warning:")} ${dualInstallWarning}`);
 	}
 }
 
