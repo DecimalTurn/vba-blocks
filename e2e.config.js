@@ -4,7 +4,8 @@ module.exports = {
 	testMatch: ["**/tests/**/*.e2e.ts"],
 	testPathIgnorePatterns: ["/node_modules/", "/lib/"],
 	moduleNameMapper: {
-		"^vbapm$": "<rootDir>/src/index.ts"
+		"^vbapm$": "<rootDir>/src/index.ts",
+		"^@timhall/dedent$": "<rootDir>/node_modules/@timhall/dedent/dist/dedent.js"
 	},
 	snapshotFormat: {
 		escapeString: true,
