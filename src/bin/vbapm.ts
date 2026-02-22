@@ -1,5 +1,6 @@
 import dedent from "@timhall/dedent";
 import { greenBright, redBright } from "@timhall/ansi-colors";
+import { existsSync } from "fs";
 import meant from "meant";
 import mri, { Args } from "mri";
 import { version } from "../../package.json";
@@ -64,11 +65,21 @@ const help = dedent`
   Use 'vbapm help COMMAND' for help on specific commands.
   Visit https://vba-blocks.com to learn more about vbapm.`;
 
-const updateAvailableMessage = () => dedent`
-  \n${greenBright("New Update!")} ${updateVersion()!}
+const updateAvailableMessage = () => {
+	const isStandalone = existsSync(env.bin);
+	if (isStandalone) {
+		return dedent`
+		  \n${greenBright("New Update!")} ${updateVersion()!}
 
-  A new version of vbapm is available.
-  Visit https://vba-blocks.com/update for more information.`;
+		  A new version of vbapm is available.
+		  Visit https://vba-blocks.com/update for more information.`;
+	}
+	return dedent`
+	  \n${greenBright("New Update!")} ${updateVersion()!}
+
+	  A new version of vbapm is available.
+	  Run "npm update -g vbapm" to update.`;
+};
 
 process.title = "vbapm";
 process.on("unhandledRejection", handleError);
