@@ -102,6 +102,7 @@ async function main() {
 			}
 		}
 
+		warnIfDualInstall();
 		return;
 	}
 
@@ -155,6 +156,10 @@ async function main() {
 		env.reporter.log(Message.UpdateAvailable, updateAvailableMessage());
 	}
 
+	warnIfDualInstall();
+}
+
+function warnIfDualInstall() {
 	const dualInstallWarning = checkDualInstall();
 	if (dualInstallWarning) {
 		console.warn(`\n${yellowBright("Warning:")} ${dualInstallWarning}`);
