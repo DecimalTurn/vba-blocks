@@ -35,14 +35,14 @@ describe("utils", () => {
 	});
 
 	test("should get local package path", () => {
-		expect(getLocalPackage(".vba-blocks/packages", dictionary)).toEqual(
-			".vba-blocks/packages/dictionary-v1.0.0.block"
+		expect(getLocalPackage(".vbapm/packages", dictionary)).toEqual(
+			".vbapm/packages/dictionary-v1.0.0.block"
 		);
 	});
 
 	test("should get source path", () => {
-		expect(getSource(".vba-blocks/sources", dictionary)).toEqual(
-			".vba-blocks/sources/dictionary-v1.0.0"
+		expect(getSource(".vbapm/sources", dictionary)).toEqual(
+			".vbapm/sources/dictionary-v1.0.0"
 		);
 	});
 });
