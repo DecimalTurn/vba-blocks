@@ -24,6 +24,10 @@ permissions:
 jobs:
   prepare-release:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.next_version.outputs.tag }}
+      sha: ${{ steps.commit.outputs.sha }}
+      version: ${{ steps.next_version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,7 +37,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 22.x
 
       - name: Get current version
         id: current_version
@@ -102,6 +106,7 @@ jobs:
           draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Add release link to summary
         run: |
           release_url="https://github.com/${{ github.repository }}/releases/tag/${{ steps.next_version.outputs.tag }}"
@@ -111,3 +116,56 @@ jobs:
             echo "- Tag: \`${{ steps.next_version.outputs.tag }}\`"
             echo "- Draft release: [$release_url]($release_url)"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  build-packages:
+    needs: prepare-release
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.sha }}
+
+      - uses: DecimalTurn/setup-vba@main
+        with:
+          office-apps: Excel
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build CLI
+        run: npm run build:cli
+
+      - name: Build addins
+        run: npm run build:addins
+
+      - name: Create packages
+        run: node scripts/create-packages
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-release.outputs.tag }}
+          files: |
+            dist/vbapm-win.zip
+            dist/vbapm-mac.tar.gz
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add package summary
+        shell: pwsh
+        run: |
+          $winSize = (Get-Item dist/vbapm-win.zip).Length / 1MB
+          $macSize = (Get-Item dist/vbapm-mac.tar.gz).Length / 1MB
+          @"
+          ## Packages uploaded
+
+          | File | Size |
+          |------|------|
+          | ``vbapm-win.zip`` | $([math]::Round($winSize, 2)) MB |
+          | ``vbapm-mac.tar.gz`` | $([math]::Round($macSize, 2)) MB |
+          "@ >> $env:GITHUB_STEP_SUMMARY
