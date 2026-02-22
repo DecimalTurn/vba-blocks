@@ -5,59 +5,59 @@ Object {
   "components": Array [
     Object {
       "name": "Class1",
-      "path": ".vba-blocks/staging/standard/import/Class1.cls",
+      "path": ".vbapm/staging/standard/import/Class1.cls",
     },
     Object {
       "name": "Dictionary",
-      "path": ".vba-blocks/staging/standard/import/Dictionary.cls",
+      "path": ".vbapm/staging/standard/import/Dictionary.cls",
     },
     Object {
       "name": "IWebAuthenticator",
-      "path": ".vba-blocks/staging/standard/import/IWebAuthenticator.cls",
+      "path": ".vbapm/staging/standard/import/IWebAuthenticator.cls",
     },
     Object {
       "name": "JsonConverter",
-      "path": ".vba-blocks/staging/standard/import/JsonConverter.bas",
+      "path": ".vbapm/staging/standard/import/JsonConverter.bas",
     },
     Object {
       "name": "Sheet1",
-      "path": ".vba-blocks/staging/standard/import/Sheet1.cls",
+      "path": ".vbapm/staging/standard/import/Sheet1.cls",
     },
     Object {
       "name": "Sheet2",
-      "path": ".vba-blocks/staging/standard/import/Sheet2.cls",
+      "path": ".vbapm/staging/standard/import/Sheet2.cls",
     },
     Object {
       "name": "Sheet3",
-      "path": ".vba-blocks/staging/standard/import/Sheet3.cls",
+      "path": ".vbapm/staging/standard/import/Sheet3.cls",
     },
     Object {
       "name": "ThisWorkbook",
-      "path": ".vba-blocks/staging/standard/import/ThisWorkbook.cls",
+      "path": ".vbapm/staging/standard/import/ThisWorkbook.cls",
     },
     Object {
       "name": "UserForm1",
-      "path": ".vba-blocks/staging/standard/import/UserForm1.frm",
+      "path": ".vbapm/staging/standard/import/UserForm1.frm",
     },
     Object {
       "name": "Validation",
-      "path": ".vba-blocks/staging/standard/import/Validation.bas",
+      "path": ".vbapm/staging/standard/import/Validation.bas",
     },
     Object {
       "name": "WebClient",
-      "path": ".vba-blocks/staging/standard/import/WebClient.cls",
+      "path": ".vbapm/staging/standard/import/WebClient.cls",
     },
     Object {
       "name": "WebHelpers",
-      "path": ".vba-blocks/staging/standard/import/WebHelpers.bas",
+      "path": ".vbapm/staging/standard/import/WebHelpers.bas",
     },
     Object {
       "name": "WebRequest",
-      "path": ".vba-blocks/staging/standard/import/WebRequest.cls",
+      "path": ".vbapm/staging/standard/import/WebRequest.cls",
     },
     Object {
       "name": "WebResponse",
-      "path": ".vba-blocks/staging/standard/import/WebResponse.cls",
+      "path": ".vbapm/staging/standard/import/WebResponse.cls",
     },
   ],
   "name": "VBAProject",
