@@ -399,9 +399,9 @@ Object {
 `;
 
 exports[`throws for invalid syntax 1`] = `
-"vba-blocks.toml is invalid:
+"vbaproject.toml is invalid:
 
-Syntax Error: fixtures/projects/invalid-manifest/vba-block.toml (2:4)
+Syntax Error: fixtures/projects/invalid-manifest/vbaproject.toml (2:4)
 
 Error parsing TOML (2, 5):
 name: Package Name
