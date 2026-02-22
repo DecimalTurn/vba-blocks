@@ -47,6 +47,20 @@ If you run into any issues during installation, please see the [known issues](ht
 
 :rocket: You're ready to go! Open a new command-line session (cmd / terminal) and try `vba --help`
 
+### Programmatic Usage
+
+You can also use `vbapm` as a library (e.g. from a VS Code extension):
+
+```js
+const { buildProject, loadProject, env } = require("vbapm");
+
+// Override working directory
+env.cwd = "/path/to/project";
+
+const project = await loadProject();
+await buildProject(project);
+```
+
 ## Usage
 
 ### `new`
@@ -235,7 +249,7 @@ Scripting = { version = "1.0", guid = "{...}" }
 ### Prerequisites
 
 1. `git clone` this repo
-2. Install [node](https://nodejs.org/) v12.19.0 or later
+2. Install [Node.js](https://nodejs.org/) v22 or later
    - Note: For CLI builds, Node v23+ only supports Windows x64 (win-x64). 32-bit Windows (win-x86) is no longer available upstream.
 3. Install node-gyp dependencies for [Mac](https://github.com/nodejs/node-gyp#on-macos) or [Windows](https://github.com/nodejs/node-gyp#on-windows)
 
@@ -260,3 +274,7 @@ Scripting = { version = "1.0", guid = "{...}" }
 
 1. Run `npm version`
 2. Run `npm run release`
+
+## Acknowledgments
+
+This project is a fork of the original [vba-blocks](https://github.com/vba-blocks/vba-blocks) project by [Tim Hall](https://github.com/timhall).
