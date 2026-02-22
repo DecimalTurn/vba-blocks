@@ -21,5 +21,5 @@ Private Sub App_WorkbookAfterSave(ByVal WB As Workbook, ByVal Success As Boolean
     ' ProjectDir = FileSystem.GetDir(WB.Path)
     ' TargetType = Replace(FileSystem.GetExtension(WB.Name), ".", "")
 
-    ' TODO vba-blocks export {TargetType} --cwd {ProjectDir}
+    ' TODO vbapm export {TargetType} --cwd {ProjectDir}
 End Sub

@@ -22,12 +22,12 @@ export interface Target {
 
 const TARGET_TYPES = ["xlsx", "xlsm", "xlam"];
 
-const EXAMPLE = `Example vba-block.toml:
+const EXAMPLE = `Example vbaproject.toml:
 
   [project]
   target = "xlsm"
 
-Example vba-block.toml with alternative path:
+Example vbaproject.toml with alternative path:
 
   [project]
   target = { type = "xlsm", path = "target/xlsm" }`;

@@ -1,4 +1,4 @@
-declare module "vba-blocks" {
+declare module "vbapm" {
 	interface RunResult {
 		success: boolean;
 		messages: string[];

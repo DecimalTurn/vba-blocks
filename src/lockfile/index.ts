@@ -19,7 +19,7 @@ import { join, relative, trailing } from "../utils/path";
 import { parse as parseToml, toLockfile as convertToLockfileToml } from "../utils/toml";
 import { Lockfile, LOCKFILE_VERSION, MinimalSnapshot } from "./lockfile";
 
-const debug = env.debug("vba-blocks:lockfile");
+const debug = env.debug("vbapm:lockfile");
 
 type DependencyByName = Map<string, Dependency>;
 

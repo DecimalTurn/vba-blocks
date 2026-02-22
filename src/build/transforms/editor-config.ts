@@ -6,7 +6,7 @@ import { BY_LINE } from "../../utils/text";
 import { BuildGraph } from "../build-graph";
 import { Component } from "../component";
 
-const debug = env.debug("vba-blocks:editor-config");
+const debug = env.debug("vbapm:editor-config");
 const cache: Map<string, EditorConfig> = new Map();
 
 export async function toCompiled(graph: BuildGraph): Promise<BuildGraph> {

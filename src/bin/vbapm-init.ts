@@ -5,7 +5,7 @@ import { initProject } from "../actions/init-project";
 const help = dedent`
   Initialize a new project in the current directory
 
-  Usage: vba-blocks init [options]
+  Usage: vbapm init [options]
 
   Options:
     --target=TYPE   Add target of type TYPE to project (e.g. xlsm)
@@ -15,8 +15,8 @@ const help = dedent`
     --no-git        Skip initializing git repository
 
   Examples:
-  vba-blocks init --target xlsm
-  vba-blocks init --name calculations --package
+  vbapm init --target xlsm
+  vbapm init --name calculations --package
   `;
 
 export default async function (args: Args) {

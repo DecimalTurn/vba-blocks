@@ -5,7 +5,7 @@ import { incrementVersion } from "../actions/increment-version";
 const help = dedent`
   Increment this project's version.
 
-  Usage: vba-blocks version [<increment>] [options]
+  Usage: vbapm version [<increment>] [options]
 
   Options:
     <increment>   VERSION | patch | minor | major | prepatch | preminor | premajor

@@ -5,7 +5,7 @@ import { exportProject } from "../actions/export-project";
 const help = dedent`
   Export built project, including src, references, and target.
 
-  Usage: vba-blocks export
+  Usage: vbapm export
 
   Options:
     --target=TYPE   Export target of type TYPE`;

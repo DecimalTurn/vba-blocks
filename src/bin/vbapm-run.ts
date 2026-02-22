@@ -5,7 +5,7 @@ import { runMacro } from "../actions/run-macro";
 const help = dedent`
   Run macro in given workbook or add-in.
 
-  Usage: vba-blocks run <macro> [<arg>...] [options]
+  Usage: vbapm run <macro> [<arg>...] [options]
 
   Options:
     <macro>         Public macro to run in given file (e.g. Tests.RunTests)

@@ -5,7 +5,7 @@ import { createProject } from "../actions/create-project";
 const help = dedent`
   Create a new project / package in a new directory
 
-  Usage: vba-blocks new <name> [options]
+  Usage: vbapm new <name> [options]
 
   Options:
     <name>          Project/package name (optionally, with extension)
@@ -15,9 +15,9 @@ const help = dedent`
     --no-git        Skip initializing git repository
 
   Examples:
-  vba-blocks new analysis.xlsm
-  vba-blocks new analysis --target xlsm
-  vba-blocks new calculations --package
+  vbapm new analysis.xlsm
+  vbapm new analysis --target xlsm
+  vbapm new calculations --package
   `;
 
 export default async function (args: Args) {

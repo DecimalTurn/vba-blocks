@@ -7,7 +7,7 @@ import { buildProject } from "../actions/build-project";
 const help = dedent`
   Build project from manifest (after backing up any existing built targets).
 
-  Usage: vba-blocks build [options]
+  Usage: vbapm build [options]
 
   Options:
     --target=TYPE   Build target of type TYPE

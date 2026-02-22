@@ -12,17 +12,17 @@ import { joinCommas } from "../utils/text";
 
 Error.stackTraceLimit = Infinity;
 
-const debug = env.debug("vba-blocks:main");
+const debug = env.debug("vbapm:main");
 
 type Command = (args: Args) => Promise<void>;
 const commands: { [name: string]: () => Promise<Command> } = {
-	new: async () => (await import("./vba-blocks-new")).default,
-	init: async () => (await import("./vba-blocks-init")).default,
-	build: async () => (await import("./vba-blocks-build")).default,
-	test: async () => (await import("./vba-blocks-test")).default,
-	export: async () => (await import("./vba-blocks-export")).default,
-	run: async () => (await import("./vba-blocks-run")).default,
-	version: async () => (await import("./vba-blocks-version")).default
+	new: async () => (await import("./vbapm-new")).default,
+	init: async () => (await import("./vbapm-init")).default,
+	build: async () => (await import("./vbapm-build")).default,
+	test: async () => (await import("./vbapm-test")).default,
+	export: async () => (await import("./vbapm-export")).default,
+	run: async () => (await import("./vbapm-run")).default,
+	version: async () => (await import("./vbapm-version")).default
 };
 
 const args = mri(process.argv.slice(2), {
@@ -37,16 +37,16 @@ if (args.debug) {
 	if (debug === true) debug = "*";
 	else if (Array.isArray(debug)) debug = debug.join(",");
 
-	const filters = (<string>debug).split(",").map(filter => `vba-blocks:${filter}`);
+	const filters = (<string>debug).split(",").map(filter => `vbapm:${filter}`);
 	const existing = process.env.DEBUG ? process.env.DEBUG.split(",") : [];
 
 	process.env.DEBUG = existing.concat(filters).join(",");
 }
 
 const help = dedent`
-  vba-blocks v${version}
+  vbapm v${version}
 
-  Usage: vba-blocks [command] [options]
+  Usage: vbapm [command] [options]
 
   Commands:
     - new           Create a new project / package in a new directory
@@ -61,16 +61,16 @@ const help = dedent`
     -h, --help      Output usage information
     -v, --version   Output the version number
 
-  Use 'vba-blocks help COMMAND' for help on specific commands.
-  Visit https://vba-blocks.com to learn more about vba-blocks.`;
+  Use 'vbapm help COMMAND' for help on specific commands.
+  Visit https://vba-blocks.com to learn more about vbapm.`;
 
 const updateAvailableMessage = () => dedent`
   \n${greenBright("New Update!")} ${updateVersion()!}
 
-  A new version of vba-blocks is available.
+  A new version of vbapm is available.
   Visit https://vba-blocks.com/update for more information.`;
 
-process.title = "vba-blocks";
+process.title = "vbapm";
 process.on("unhandledRejection", handleError);
 process.on("uncaughtException", handleError);
 
@@ -121,7 +121,7 @@ async function main() {
         Unknown command "${command}"${did_you_mean}
 
         Available commands are ${list}.
-        Try "vba-blocks help" for more information.
+        Try "vbapm help" for more information.
       `
 		);
 	}
@@ -131,7 +131,7 @@ async function main() {
 
 	let subcommand: (args: Args) => Promise<void>;
 	try {
-		debug(`loading "./vba-blocks-${command}.js"`);
+		debug(`loading "./vbapm-${command}.js"`);
 		subcommand = await commands[command]();
 	} catch (err: any) {
 		throw new Error(`Failed to load command "${command}".\n${err?.stack || err}`);

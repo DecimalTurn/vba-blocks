@@ -4,7 +4,7 @@ import { env } from "../../env";
 
 import { UnzipFile } from "../../utils/zip";
 
-const debug = env.debug("vba-blocks:target.transforms.workbook-xml");
+const debug = env.debug("vbapm:target.transforms.workbook-xml");
 const WORKBOOK_XML = /xl[\/,\\]workbook\.xml/i;
 
 export default function transformWorkbookXml(file: UnzipFile): UnzipFile {

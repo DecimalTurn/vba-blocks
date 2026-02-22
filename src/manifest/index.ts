@@ -24,7 +24,7 @@ export type ManifestType = "package" | "project";
 /*
   # Manifest
 
-  The parsed vba-block.toml manifest.
+  The parsed vbaproject.toml manifest.
   package/project, src, dependencies, etc are all parsed and put in a consistent form
 
   ```toml
@@ -59,14 +59,14 @@ export interface Manifest extends Snapshot {
 	target?: Target;
 }
 
-const EXAMPLE = `Example vba-block.toml for a package (e.g. library to be shared):
+const EXAMPLE = `Example vbaproject.toml for a package (e.g. library to be shared):
 
   [package]
   name = "my-package"
   version = "0.0.0"
   authors = ["..."]
 
-Example vba-block.toml for a project (e.g. workbook, document, etc.):
+Example vbaproject.toml for a project (e.g. workbook, document, etc.):
 
   [project]
   name = "my-project"
@@ -133,15 +133,15 @@ export function parseManifest(value: any, dir: string): Manifest {
 }
 
 export async function loadManifest(dir: string): Promise<Manifest> {
-	const file = join(dir, "vba-block.toml");
+	const file = join(dir, "vbaproject.toml");
 
 	if (!(await pathExists(file))) {
 		throw new CliError(
 			ErrorCode.ManifestNotFound,
 			dedent`
-        vba-blocks.toml not found in "${dir}".
+        vbaproject.toml not found in "${dir}".
 
-        Try "vba-blocks init" to start a new project in this directory
+        Try "vbapm init" to start a new project in this directory
         or "cd YOUR_PROJECTS_DIRECTORY" to change to a folder that contains an existing project.
       `
 		);
@@ -156,7 +156,7 @@ export async function loadManifest(dir: string): Promise<Manifest> {
 		throw new CliError(
 			ErrorCode.ManifestInvalid,
 			dedent`
-				vba-blocks.toml is invalid:
+				vbaproject.toml is invalid:
 
 				Syntax Error: ${file} (${err?.line}:${err?.column})\n\n${err?.message || err}
 			`
@@ -170,7 +170,7 @@ export async function loadManifest(dir: string): Promise<Manifest> {
 
 export async function writeManifest(manifest: Manifest, dir: string) {
 	const value = formatManifest(manifest, dir);
-	const path = join(dir, "vba-block.toml");
+	const path = join(dir, "vbaproject.toml");
 	let toml: string;
 
 	if (await pathExists(path)) {

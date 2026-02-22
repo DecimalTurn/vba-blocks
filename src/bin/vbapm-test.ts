@@ -5,13 +5,13 @@ import { testProject } from "../actions/test-project";
 const help = dedent`
   Run tests for built target.
 
-  Usage: vba-blocks test [options]
+  Usage: vbapm test [options]
 
   Options:
     --target=TYPE   Run in pre-built target of type TYPE
 
   Notes:
-  Currently, vba-blocks uses the following convention:
+  Currently, vbapm uses the following convention:
 
   Windows: "vba run Tests.Run CON"
   Mac:     "vba run Tests.Run /dev/stdout"

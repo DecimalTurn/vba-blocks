@@ -5,7 +5,7 @@ import { cache } from "./cache";
 import { env } from "./env";
 import { getLatestRelease } from "./utils/github";
 
-const debug = env.debug("vba-blocks:installer");
+const debug = env.debug("vbapm:installer");
 
 export function updateVersion(): string | undefined {
 	return cache.latest_version;
@@ -24,10 +24,10 @@ export async function checkForUpdate(): Promise<boolean> {
 		return updateAvailable();
 
 	// Allow skipping from the outside
-	// set VBA_BLOCKS_SKIP_UPDATE_CHECK=1
+	// set VBAPM_SKIP_UPDATE_CHECK=1
 	//
 	// (maybe this should be added to config)
-	if (parseInt(env.values.VBA_BLOCKS_SKIP_UPDATE_CHECK, 10)) return false;
+	if (parseInt(env.values.VBAPM_SKIP_UPDATE_CHECK, 10)) return false;
 
 	cache.latest_version_checked = Date.now();
 

@@ -91,7 +91,7 @@ Public Function ExportTo(Info As Variant) As String
     Next Component
 
     ' For "indirect" values (VBA project name and references)
-    ' export to project.json for post-processing by vba-blocks
+    ' export to project.json for post-processing by vbapm
     Dim Project As New Dictionary
 
     Project("name") = Document.VBProject.Name

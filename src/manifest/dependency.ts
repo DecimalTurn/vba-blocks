@@ -44,7 +44,7 @@ export interface GitDependency extends DependencyDetails {
 
 export type Dependency = RegistryDependency | PathDependency | GitDependency;
 
-const EXAMPLE = `Example vba-block.toml:
+const EXAMPLE = `Example vbaproject.toml:
 
   [dependencies]
   a = "^1.0.0"
