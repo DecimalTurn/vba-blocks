@@ -4,6 +4,16 @@ A package manager and build tool for VBA.
 
 ## Installation
 
+### Option 1: Install as a global npm package
+
+**Prerequisites:** [Node.js](https://nodejs.org/) v22 or higher.
+
+```txt
+npm install -g vbapm
+```
+
+### Option 2: Standalone installer
+
 **Windows**
 
 In powershell, run the following:
