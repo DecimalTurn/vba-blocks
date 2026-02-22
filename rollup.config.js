@@ -9,6 +9,36 @@ import typescript from "@rollup/plugin-typescript";
 const mode = process.env.NODE_ENV || "production";
 const builtins = new Set(builtin);
 
+// Add shebang to CLI entry point and make it executable.
+// Needed for npm's "bin" field to work. The standalone build
+// ignores the shebang because it invokes lib/vbapm.js explicitly
+// via the vendored node binary.
+function shebang() {
+	return {
+		name: "shebang",
+		renderChunk(code, chunk) {
+			if (chunk.facadeModuleId && chunk.facadeModuleId.includes("vbapm.ts")) {
+				return { code: "#!/usr/bin/env node\n" + code, map: null };
+			}
+			return null;
+		},
+		writeBundle(options, bundle) {
+			const fs = require("fs");
+			const path = require("path");
+			for (const [fileName] of Object.entries(bundle)) {
+				if (fileName === "vbapm.js") {
+					const filePath = path.resolve(options.dir, fileName);
+					try {
+						fs.chmodSync(filePath, 0o755);
+					} catch (e) {
+						// Ignore chmod errors on Windows
+					}
+				}
+			}
+		}
+	};
+}
+
 export default [
 	{
 		input: ["src/index.ts", "src/bin/vbapm.ts", "src/debug.ts"],
@@ -36,7 +66,8 @@ export default [
 			mode === "production" && terser(),
 			readableStream(),
 			debug(),
-			workerThreads()
+			workerThreads(),
+			shebang()
 		].filter(Boolean),
 		onwarn(warning, warn) {
 			// Ignore known errors
