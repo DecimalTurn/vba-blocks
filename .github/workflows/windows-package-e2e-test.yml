@@ -36,7 +36,7 @@ jobs:
       - name: Install Node dependencies and build
         run: |
           npm install
-          npm run build
+          npm run build:lib
           npm run build:addins
 
       - name: Install globally from local build

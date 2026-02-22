@@ -82,11 +82,11 @@ Most fields are already correct since the rename to `vbapm`. Add fields needed f
     // Core build: rollup + type declarations (used by both channels)
     "build": "rimraf lib && rollup -c && tsc -p tsconfig.build.json",
     // Standalone build: also fetch vendored node
-    "build:standalone": "npm run build && node scripts/ensure-vendor",
+    "build:cli": "npm run build && node scripts/ensure-vendor",
     // prepublishOnly ensures lib/ is fresh before npm publish
     "prepublishOnly": "npm run build",
     // Standalone release: build everything + create platform archives
-    "version": "npm run build:standalone && npm run build:addins && node scripts/create-packages"
+    "version": "npm run build:cli && npm run build:addins && node scripts/create-packages"
   }
 }
 ```
@@ -94,9 +94,9 @@ Most fields are already correct since the rename to `vbapm`. Add fields needed f
 Key points:
 - `"bin"` becomes an object with both `vbapm` and `vba` aliases pointing to `lib/vbapm.js`.
 - `"build"` now does rollup + `.d.ts` generation (no `ensure-vendor`).
-- `"build:standalone"` does `build` + `ensure-vendor` for the standalone pipeline.
+- `"build:cli"` does `build` + `ensure-vendor` for the standalone pipeline.
 - `"prepublishOnly"` runs the core build before `npm publish`.
-- `"version"` uses `build:standalone` for creating GitHub release archives.
+- `"version"` uses `build:cli` for creating GitHub release archives.
 - `"files"` ensures `npm publish` excludes `bin/`, `vendor/`, `scripts/`, `src/`, etc.
 - `"types"` and `"exports"` enable TypeScript consumers to import from the npm package.
 
@@ -234,7 +234,7 @@ Keep `env.bin` as-is (`join(root, "bin")`). When installed via npm, the `bin/` d
 
 | Script | Status |
 |--------|--------|
-| `scripts/ensure-vendor.js` | **Keep** — only used for standalone builds via `build:standalone` |
+| `scripts/ensure-vendor.js` | **Keep** — only used for standalone builds via `build:cli` |
 | `scripts/create-packages.js` | **Keep** — creates `.zip`/`.tar.gz` for GitHub releases |
 | `scripts/release.js` | **Modify** — optionally add `npm publish` step |
 
