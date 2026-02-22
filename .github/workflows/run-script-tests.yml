@@ -235,7 +235,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build
+        run: npm run build:cli
 
       - name: Test escape/unescape round-trip
         run: |
@@ -298,7 +298,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build
+        run: npm run build:cli
 
       - name: Verify script selection
         shell: bash
