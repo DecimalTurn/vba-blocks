@@ -46,7 +46,6 @@
         "prepublishOnly": "npm run build:lib",
         "version": "npm run build:cli && npm run build:addins && node scripts/create-packages",
         "postversion": "git push && git push --tags",
-        "release": "node scripts/release",
         "clean": "rimraf lib && rimraf dist && rimraf addins/build"
     },
     "jest": {
@@ -90,8 +89,6 @@
         "xml-js": "^1.6"
     },
     "devDependencies": {
-        "@octokit/core": "^7.0.6",
-        "@octokit/rest": "^22.0.1",
         "@rollup/plugin-commonjs": "^15.1.0",
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^9.0.0",
@@ -108,7 +105,6 @@
         "builtin-modules": "^3.0.0",
         "cross-env": "^5",
         "dotenv": "^7.0.0",
-        "editor": "^1.0.0",
         "jest": "^29",
         "mustache": "^3",
         "npm-run-all": "^4",
@@ -140,7 +136,6 @@
             "scripts.prepublishOnly": "Ensures lib/ is fresh before npm publish",
             "scripts.version": "Standalone release: build everything + create platform archives for GitHub releases",
             "scripts.postversion": "Pushes commits and tags to the remote repository after versioning",
-            "scripts.release": "Runs a custom release script to publish the new version",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
             "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts",
             "overrides": "Pins vulnerable transitive dependencies to patched versions to remove critical npm audit findings without large upstream upgrades.",
