@@ -45,7 +45,7 @@ export default [
 		output: {
 			format: "cjs",
 			dir: "lib",
-			sourcemap: true,
+			sourcemap: false,
 			exports: "auto"
 		},
 		external(id) {
