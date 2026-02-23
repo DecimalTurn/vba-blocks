@@ -9,6 +9,8 @@ on:
       - dual-output*
     paths-ignore:
       - '**/*.md'
+      - '.github/workflows/prepare-release.yml'
+      - '.github/workflows/publish.yml'
   pull_request:
   workflow_dispatch:
 
