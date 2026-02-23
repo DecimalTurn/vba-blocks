@@ -29,6 +29,7 @@ jobs:
       tag: ${{ steps.next_version.outputs.tag }}
       sha: ${{ steps.commit.outputs.sha }}
       version: ${{ steps.next_version.outputs.version }}
+      release_url: ${{ steps.create_draft_release.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -125,19 +126,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Add release link to summary
-        run: |
-            release_url="${{ steps.create_draft_release.outputs.url }}"
-            {
-              echo "## Release prepared"
-              echo ""
-              echo "- Tag: \`${{ steps.next_version.outputs.tag }}\`"
-              echo "- Draft release: [$release_url]($release_url)"
-            } >> "$GITHUB_STEP_SUMMARY"
-
   build-packages:
     needs: prepare-release
     runs-on: windows-2022
+    outputs:
+      release_url: ${{ steps.upload_assets.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -164,6 +157,7 @@ jobs:
         run: node scripts/create-packages
 
       - name: Upload release assets
+        id: upload_assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.prepare-release.outputs.tag }}
@@ -187,3 +181,21 @@ jobs:
           | ``vbapm-win.zip`` | $([math]::Round($winSize, 2)) MB |
           | ``vbapm-mac.tar.gz`` | $([math]::Round($macSize, 2)) MB |
           "@ >> $env:GITHUB_STEP_SUMMARY
+
+  summary:
+    needs: [prepare-release, build-packages]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add release link to summary
+        run: |
+          release_url="${{ needs.build-packages.outputs.release_url }}"
+          # Fall back to the URL captured before asset upload if needed
+          if [[ -z "$release_url" ]]; then
+            release_url="${{ needs.prepare-release.outputs.release_url }}"
+          fi
+          {
+            echo "## Release prepared"
+            echo ""
+            echo "- Tag: \`${{ needs.prepare-release.outputs.tag }}\`"
+            echo "- Draft release: [$release_url]($release_url)"
+          } >> "$GITHUB_STEP_SUMMARY"
