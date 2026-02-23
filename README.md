@@ -50,6 +50,8 @@ For more recent versions of Office for Mac, you will need to trust access to the
 
 </details>
 
+<hr>
+
 If you run into any issues during installation, please see the [known issues](https://github.com/vbapm/installer#known-issues) for the installer or [create a new issue](https://github.com/vbapm/installer/issues/new) with details about what's happening.
 
 :rocket: You're ready to go! Open a new command-line session (cmd / terminal) and try `vba --help`
