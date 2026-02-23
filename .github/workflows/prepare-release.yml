@@ -98,7 +98,6 @@ jobs:
       - name: Update package-lock.json
         if: github.event.inputs.version_bump != 'no-bump'
         run: npm install --package-lock-only
-          if: github.event.inputs.version_bump != 'no-bump'
 
       - name: Commit changes
         id: commit
@@ -116,6 +115,7 @@ jobs:
             fi
 
       - name: Create Draft Release
+        id: create_draft_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.next_version.outputs.tag }}
