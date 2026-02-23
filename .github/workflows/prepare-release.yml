@@ -182,7 +182,7 @@ jobs:
           | ``vbapm-mac.tar.gz`` | $([math]::Round($macSize, 2)) MB |
           "@ >> $env:GITHUB_STEP_SUMMARY
 
-  summary:
+  report:
     needs: [prepare-release, build-packages]
     runs-on: ubuntu-latest
     steps:
