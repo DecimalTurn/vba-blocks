@@ -14,12 +14,15 @@ npm install -g vbapm
 
 ### Option 2: Standalone installer
 
+<details>
+<summary>Installation instructions</summary>
+
 **Windows**
 
 In powershell, run the following:
 
 ```txt
-iwr https://vba-blocks.com/install.ps1 | iex
+iwr https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.ps1 | iex
 ```
 
 **Mac**
@@ -27,7 +30,7 @@ iwr https://vba-blocks.com/install.ps1 | iex
 In terminal, run the following:
 
 ```txt
-curl -fsSL https://vba-blocks.com/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.sh | sh
 ```
 
 For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vbapm to work correctly:
@@ -43,7 +46,11 @@ For more recent versions of Office for Mac, you will need to trust access to the
  </ol>
 </details>
 
-If you run into any issues during installation, please see the [known issues](https://github.com/vba-blocks/installer#known-issues) for the installer or [create a new issue](https://github.com/vba-blocks/installer/issues/new) with details about what's happening.
+
+
+</details>
+
+If you run into any issues during installation, please see the [known issues](https://github.com/vbapm/installer#known-issues) for the installer or [create a new issue](https://github.com/vbapm/installer/issues/new) with details about what's happening.
 
 :rocket: You're ready to go! Open a new command-line session (cmd / terminal) and try `vba --help`
 
