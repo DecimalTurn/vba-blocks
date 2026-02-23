@@ -127,7 +127,7 @@ jobs:
 
       - name: Add release link to summary
         run: |
-            release_url="${{ steps.create_draft_release.outputs.html_url }}"
+            release_url="${{ steps.create_draft_release.outputs.url }}"
             {
               echo "## Release prepared"
               echo ""
