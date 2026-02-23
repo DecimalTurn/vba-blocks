@@ -9,9 +9,10 @@ on:
         default: 'patch'
         type: choice
         options:
-          - major
-          - minor
-          - patch
+            - major
+            - minor
+            - patch
+            - no-bump
       remove_suffix:
         description: 'Remove pre-release suffix (e.g. -alpha)'
         required: false
@@ -57,45 +58,62 @@ jobs:
       - name: Calculate next version
         id: next_version
         run: |
-          IFS='.' read -r major minor patch <<< "${{ steps.current_version.outputs.base }}"
-          case "${{ github.event.inputs.version_bump }}" in
-            major)
-              ((major+=1)); minor=0; patch=0;;
-            minor)
-              ((minor+=1)); patch=0;;
-            patch)
-              ((patch+=1));;
-          esac
-          new_version="$major.$minor.$patch"
-
-          # Preserve suffix unless user chose to remove it
-          suffix="${{ steps.current_version.outputs.suffix }}"
-          if [[ -n "$suffix" && "${{ github.event.inputs.remove_suffix }}" != "true" ]]; then
-            new_version="$new_version-$suffix"
-          fi
-
-          echo "Next version: $new_version"
-          echo "version=$new_version" >> $GITHUB_OUTPUT
-          echo "tag=v$new_version" >> $GITHUB_OUTPUT
+            IFS='.' read -r major minor patch <<< "${{ steps.current_version.outputs.base }}"
+            if [[ "${{ github.event.inputs.version_bump }}" == "no-bump" ]]; then
+              new_version="${{ steps.current_version.outputs.base }}"
+              suffix="${{ steps.current_version.outputs.suffix }}"
+              if [[ -n "$suffix" && "${{ github.event.inputs.remove_suffix }}" != "true" ]]; then
+                new_version="$new_version-$suffix"
+              fi
+              echo "No version bump selected."
+            else
+              case "${{ github.event.inputs.version_bump }}" in
+                major)
+                  ((major+=1)); minor=0; patch=0;;
+                minor)
+                  ((minor+=1)); patch=0;;
+                patch)
+                  ((patch+=1));;
+              esac
+              new_version="$major.$minor.$patch"
+              suffix="${{ steps.current_version.outputs.suffix }}"
+              if [[ -n "$suffix" && "${{ github.event.inputs.remove_suffix }}" != "true" ]]; then
+                new_version="$new_version-$suffix"
+              fi
+              echo "Next version: $new_version"
+            fi
+            echo "version=$new_version" >> $GITHUB_OUTPUT
+            echo "tag=v$new_version" >> $GITHUB_OUTPUT
 
       - name: Update package.json
         run: |
-          NEW_VERSION="${{ steps.next_version.outputs.version }}"
-          jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
-          mv package.json.tmp package.json
+            if [[ "${{ github.event.inputs.version_bump }}" != "no-bump" ]]; then
+              NEW_VERSION="${{ steps.next_version.outputs.version }}"
+              jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
+              mv package.json.tmp package.json
+            else
+              echo "Skipping package.json update (no-bump selected)"
+            fi
 
       - name: Update package-lock.json
+        if: github.event.inputs.version_bump != 'no-bump'
         run: npm install --package-lock-only
+          if: github.event.inputs.version_bump != 'no-bump'
 
       - name: Commit changes
         id: commit
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add package.json package-lock.json
-          git commit -m "chore: bump version to ${{ steps.next_version.outputs.version }}"
-          git push origin ${{ github.ref_name }}
-          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            if [[ "${{ github.event.inputs.version_bump }}" != "no-bump" ]]; then
+              git config user.name "github-actions"
+              git config user.email "github-actions@github.com"
+              git add package.json package-lock.json
+              git commit -m "chore: bump version to ${{ steps.next_version.outputs.version }}"
+              git push origin ${{ github.ref_name }}
+              echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            else
+              echo "Skipping commit (no-bump selected)"
+              echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            fi
 
       - name: Create Draft Release
         uses: softprops/action-gh-release@v2
@@ -109,13 +127,13 @@ jobs:
 
       - name: Add release link to summary
         run: |
-          release_url="https://github.com/${{ github.repository }}/releases/tag/${{ steps.next_version.outputs.tag }}"
-          {
-            echo "## Release prepared"
-            echo ""
-            echo "- Tag: \`${{ steps.next_version.outputs.tag }}\`"
-            echo "- Draft release: [$release_url]($release_url)"
-          } >> "$GITHUB_STEP_SUMMARY"
+            release_url="${{ steps.create_draft_release.outputs.html_url }}"
+            {
+              echo "## Release prepared"
+              echo ""
+              echo "- Tag: \`${{ steps.next_version.outputs.tag }}\`"
+              echo "- Draft release: [$release_url]($release_url)"
+            } >> "$GITHUB_STEP_SUMMARY"
 
   build-packages:
     needs: prepare-release
