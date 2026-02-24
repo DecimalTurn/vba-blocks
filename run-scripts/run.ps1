@@ -1,4 +1,6 @@
 param(
+    [switch]$KeepAlive,
+
     [Parameter(Position=0)]
     [string]$AppName,
 
@@ -177,13 +179,36 @@ function Run {
         [string[]]$MacroArgValues
     )
 
+    $SessionPath = Join-Path $env:TEMP "vbapm-session.json"
+
     switch ($AppName) {
         "excel" {
             $excel = [Excel]::new()
             try {
                 $result = $excel.Run($FilePath, $MacroName, $MacroArgValues)
             } finally {
-                $excel.Dispose()
+                if ($script:KeepAlive) {
+                    # Save original state on first keep-alive call
+                    if (-not (Test-Path $SessionPath)) {
+                        @{
+                            excelWasOpen = $excel.ExcelWasOpen
+                            workbookWasOpen = $excel.WorkbookWasOpen
+                        } | ConvertTo-Json | Set-Content $SessionPath
+                    }
+                    # Skip Dispose — leave Excel and addin open for next call
+                } else {
+                    # Restore original state from session if a keep-alive session was active
+                    if (Test-Path $SessionPath) {
+                        $session = Get-Content $SessionPath -Raw | ConvertFrom-Json
+                        $sessionAge = (Get-Date) - (Get-Item $SessionPath).LastWriteTime
+                        if ($sessionAge.TotalSeconds -lt 120) {
+                            $excel.ExcelWasOpen = [bool]$session.excelWasOpen
+                            $excel.WorkbookWasOpen = [bool]$session.workbookWasOpen
+                        }
+                        Remove-Item $SessionPath -ErrorAction SilentlyContinue
+                    }
+                    $excel.Dispose()
+                }
             }
         }
         default {

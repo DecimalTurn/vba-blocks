@@ -14,6 +14,7 @@ export interface BuildOptions {
 	release?: boolean;
 	target?: string;
 	addin?: string;
+	keepAlive?: boolean;
 }
 
 const isCreateDocumentError = (message: string) => /1004/.test(message);
@@ -40,7 +41,7 @@ export async function buildTarget(target: Target, info: ProjectInfo, options: Bu
 	try {
 		staged = !info.blankTarget
 			? await createTarget(project, target)
-			: await createDocument(project, target, { staging: true });
+			: await createDocument(project, target, { staging: true, keepAlive: options.keepAlive });
 	} catch (error: any) {
 		// Error "1004: Method 'CreateDocument' of object 'OfficeApplication' failed"
 		// occurs when trying to create a document with the same name on Mac
@@ -50,7 +51,8 @@ export async function buildTarget(target: Target, info: ProjectInfo, options: Bu
 		throw new CliError(ErrorCode.TargetIsOpen, targetIsOpen(target, file));
 	}
 
-	await importTarget(target, info, staged, options);
+	// Last COM call should not keep alive — allow proper cleanup
+	await importTarget(target, info, staged, { ...options, keepAlive: false });
 
 	// Backup and move from staging to build directory
 	try {

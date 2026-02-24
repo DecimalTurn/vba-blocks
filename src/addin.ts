@@ -13,6 +13,7 @@ export type Addin = string;
 export interface AddinOptions {
 	addin?: string;
 	staging?: boolean;
+	keepAlive?: boolean;
 }
 
 export const extensions: { [application: string]: string[] } = {
@@ -49,7 +50,7 @@ export async function importGraph(
 			src: components,
 			references
 		})
-	]);
+	], { keepAlive: options.keepAlive });
 }
 
 /**
@@ -79,7 +80,7 @@ export async function exportTo(
 			file,
 			staging
 		})
-	]);
+	], { keepAlive: options.keepAlive });
 }
 
 /**
@@ -101,7 +102,7 @@ export async function createDocument(
 		JSON.stringify({
 			path
 		})
-	]);
+	], { keepAlive: options.keepAlive });
 
 	// For Mac, then copy staged to build directory
 	if (useStaging) {

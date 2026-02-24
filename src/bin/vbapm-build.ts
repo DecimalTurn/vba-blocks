@@ -12,7 +12,8 @@ const help = dedent`
   Options:
     --target=TYPE   Build target of type TYPE
     --release       Exclude dev-* items from build
-    --open          Open built target`;
+    --open          Open built target
+    --keep-alive    Keep Excel open between build steps for faster builds`;
 
 export default async function (args: Args) {
 	if (args.help) {
@@ -24,8 +25,9 @@ export default async function (args: Args) {
 	const target = <string | undefined>args.target;
 	const addin = <string | undefined>args.addin;
 	const release = !!args.release;
+	const keepAlive = !!args["keep-alive"];
 
-	const path = await buildProject({ target, addin, release });
+	const path = await buildProject({ target, addin, release, keepAlive });
 	console.log(`Done. ${time(process.hrtime(start))}`);
 
 	if (!!args.open) {
