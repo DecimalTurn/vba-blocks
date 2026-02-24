@@ -184,19 +184,26 @@ Howdy Tim!
 
 ## Manifest (vbaproject.toml)
 
+The vbapm manifest (vbaproject.toml) serves as the foundation for your project and provides information on your package, source, dependencies, references, and targets, as detailed below.
+
 ### [project] or [package]
 
+The `[package]` / `[project]` section includes general information about your package. You should choose `[package]` if your project is only intended to be used as a utility inside another project and `[project]` if your project is a standalone tool.
+
+Here are the main properties:
 - `name` (_required_)
 - `version` (_required_ for `[package]`)
 - `authors` (_required_ for `[package]`)
 - `target` (_required_ for `[project]`)
 
+**Example 1**
 ```toml
 [project]
 name = "awesome-excel-project"
 target = "xlsm"
 ```
 
+**Example 2**
 ```toml
 [package]
 name = "awesome-vba-package"
@@ -204,7 +211,26 @@ authors = ["Me <me@email.com>"]
 version = "0.1.0"
 ```
 
+#### [version]
+vbapm follows [Semantic Versioning](https://semver.org/). Make sure you adopt a compatible versioning approach if you intend to publish to the repository.
+
+#### [target]
+`target` is used to define what application/extension to use when building your project. It can be a string for the extension, in which case `target/` includes the source files for creating the target. Otherwise, `type` and `path` can be used to define a custom target path.
+
+Example 1:
+```toml
+target = "xlsm"
+# equivalent to target = { type = "xlsm", path = "target" }
+```
+
+Example 2:
+```toml
+target = { type = "xlam", path = "targets/xlam" }
+```
+
 ### [src]
+
+Will contain the list of source code files to be included in the VBA-Enabled Document at build time.
 
 `name = "path"` or
 
