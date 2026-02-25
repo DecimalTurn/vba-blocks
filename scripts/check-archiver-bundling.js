@@ -207,9 +207,7 @@ export default {
 			if (output.includes("__ARCHIVER_OK__")) {
 				console.log("FAIL - archiver can now be safely bundled by rollup!\n");
 				console.log("The vendoring workaround is no longer needed. You should:");
-				console.log(
-					'  1. Remove `id === "archiver" ||` from external() in rollup.config.js'
-				);
+				console.log('  1. Remove `id === "archiver" ||` from external() in rollup.config.js');
 				console.log(
 					"  2. Remove vendorArchiver() and related functions from scripts/ensure-vendor.js"
 				);
@@ -223,7 +221,9 @@ export default {
 			console.log("PASS - bundled archiver crashes at runtime.\n");
 			console.log("The vendoring workaround in ensure-vendor.js is still needed.");
 			if (stderr.includes("Class extends value undefined") || stderr.includes("superCtor")) {
-				console.log("Reason: readable-stream version mismatch still causes class inheritance failures.");
+				console.log(
+					"Reason: readable-stream version mismatch still causes class inheritance failures."
+				);
 				console.log("See: https://github.com/archiverjs/node-archiver/issues/711");
 			} else {
 				console.log("Runtime error:", stderr || err.message);

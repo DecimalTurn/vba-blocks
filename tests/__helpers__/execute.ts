@@ -39,11 +39,29 @@ export async function setup(dir: string, id: string, action: (cwd: string) => vo
 	});
 }
 
+/**
+ * Resolves the `vba` binary path.
+ *
+ * When the `VBA_BIN_DIR` environment variable is set, the binary is resolved
+ * from that directory (e.g. `%APPDATA%\vbapm\bin`). This allows e2e tests to
+ * exercise the **installed** CLI rather than the checkout's dev copy.
+ *
+ * Falls back to `<checkout>/bin/vba` when `VBA_BIN_DIR` is not set.
+ */
+function getVbaBin(binDir?: string): string {
+	const dir = binDir ?? process.env.VBA_BIN_DIR;
+	if (dir) {
+		return resolve(dir, "vba");
+	}
+	return resolve(__dirname, "../../bin/vba");
+}
+
 export async function execute(
 	cwd: string,
-	command: string
+	command: string,
+	options?: { binDir?: string }
 ): Promise<{ stdout: string; stderr: string }> {
-	const bin = resolve(__dirname, "../../bin/vba");
+	const bin = getVbaBin(options?.binDir);
 	const result = await exec(`${bin} ${command}`, { cwd });
 
 	// Give Office time to clean up

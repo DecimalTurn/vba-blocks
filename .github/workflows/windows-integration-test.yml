@@ -121,7 +121,9 @@ jobs:
           where.exe vba
           vba --version
 
-      - name: Run e2e tests
+      - name: Run e2e tests (installed CLI)
         shell: pwsh
+        env:
+          VBA_BIN_DIR: ${{ env.APPDATA }}\vbapm\bin
         run: |
           npm run test:e2e
