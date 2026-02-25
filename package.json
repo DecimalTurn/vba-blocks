@@ -44,7 +44,8 @@
     "build:dev": "cross-env NODE_ENV=development rollup -c",
     "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
     "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vbapm build",
-    "clean": "rimraf lib && rimraf dist && rimraf addins/build"
+    "clean": "rimraf lib && rimraf dist && rimraf addins/build",
+    "check:archiver": "node scripts/check-archiver-bundling"
   },
   "jest": {
     "preset": "ts-jest",
@@ -132,6 +133,7 @@
       "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
       "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
       "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
+      "scripts.check:archiver": "Validates that the archiver vendoring workaround is still needed (exit 0 = still needed, exit 1 = can be removed). See scripts/check-archiver-bundling.js.",
       "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts",
       "overrides": "Pins vulnerable transitive dependencies to patched versions to remove critical npm audit findings without large upstream upgrades.",
       "overrides.minimist": "Prototype pollution fix, mainly needed for ts-jest/handlebars transitive chain.",

@@ -29,17 +29,45 @@ async function main() {
 	await vendorArchiver();
 }
 
-// archiver cannot be bundled by rollup (or any other bundler) because its
-// dependency tree contains circular CJS requires that cause class parents to
-// be undefined at evaluation time, resulting in:
-//   "TypeError: Class extends value undefined is not a constructor or null"
-// This is a known issue: https://github.com/archiverjs/node-archiver/issues/711
+// WORKAROUND: archiver cannot be bundled by rollup because of a version
+// mismatch in its dependency tree that breaks class inheritance at runtime.
+// This is a known upstream issue:
+//   https://github.com/archiverjs/node-archiver/issues/711
+//
+// The problem:
+//
+//   archiver ──► archiver-utils ──► lazystream ──► readable-stream@2
+//      │                                              (nested node_modules)
+//      ├──► zip-stream ──► compress-commons ──► readable-stream@4
+//      │                        └──► crc32-stream ──► readable-stream@4
+//      └──► readable-stream@4
+//
+//   lazystream pins readable-stream@^2, while every other package uses @^4.
+//   readable-stream v2 has files like readable.js, passthrough.js, duplex.js.
+//   readable-stream v4 moved to lib/ours/index.js and uses _stream_*.js shims.
+//
+//   Our readableStream() rollup plugin (in rollup.config.js) replaces
+//   readable-stream with Node's built-in stream module by intercepting
+//   files matching the v2 layout. When rollup bundles archiver, it resolves
+//   both versions and the plugin only partially replaces them. Combined with
+//   code splitting across multiple entry points, class parent references
+//   (e.g. CRC32Stream extends Transform) end up undefined before they're
+//   defined, causing:
+//     "TypeError: Class extends value undefined is not a constructor or null"
 //
 // To work around this, archiver is marked as external in rollup.config.js and
 // we copy it (with all transitive deps) into lib/node_modules/ so Node's
 // module resolution finds them next to lib/vbapm.js at runtime.
 // create-packages.js already picks up lib/** via walkSync, so the copied
 // packages are automatically included in the distribution zip.
+//
+// TODO: Remove this workaround when archiver's tree uses a single
+// readable-stream version (or drops it entirely in favor of Node streams).
+// Run "npm run check:archiver" to test if bundling is safe again.
+// If it prints PASS, you can:
+//   1. Remove `id === "archiver" ||` from external() in rollup.config.js
+//   2. Remove vendorArchiver() and related functions below
+//   3. Delete scripts/check-archiver-bundling.js
 async function vendorArchiver() {
 	const src = join(root, "node_modules");
 	const dest = join(lib, "node_modules");
@@ -66,6 +94,31 @@ async function copyModule(name, src, dest, visited) {
 	const deps = Object.keys(pkg.dependencies || {});
 	for (const dep of deps) {
 		await copyModule(dep, src, dest, visited);
+	}
+
+	// Some packages have nested node_modules/ with their own dependencies
+	// (e.g. lazystream/node_modules/readable-stream). Those nested deps may
+	// require packages hoisted to the top-level node_modules/ (e.g.
+	// process-nextick-args). Walk nested node_modules/ to discover and copy
+	// those transitive dependencies as well.
+	const nestedModules = join(srcDir, "node_modules");
+	if (await pathExists(nestedModules)) {
+		const { readdirSync } = require("fs");
+		const nested = readdirSync(nestedModules).filter(n => !n.startsWith("."));
+		for (const nestedName of nested) {
+			const nestedPkg = join(nestedModules, nestedName, "package.json");
+			if (await pathExists(nestedPkg)) {
+				const nestedMeta = JSON.parse(await readFile(nestedPkg, "utf8"));
+				const nestedDeps = Object.keys(nestedMeta.dependencies || {});
+				for (const dep of nestedDeps) {
+					// Only copy if it's not already satisfied by the nested node_modules
+					const nestedDepPath = join(nestedModules, dep);
+					if (!(await pathExists(nestedDepPath))) {
+						await copyModule(dep, src, dest, visited);
+					}
+				}
+			}
+		}
 	}
 }
 

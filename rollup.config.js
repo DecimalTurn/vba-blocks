@@ -48,6 +48,9 @@ export default [
 			sourcemap: false,
 			exports: "auto"
 		},
+		// archiver must stay external due to circular CJS deps that break bundling.
+		// See scripts/ensure-vendor.js for details. Run "npm run check:archiver"
+		// to test if this workaround can be removed.
 		external(id) {
 			return id === "archiver" || builtins.has(id) || id.startsWith("node:");
 		},
