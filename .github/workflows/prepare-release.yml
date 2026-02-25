@@ -31,7 +31,7 @@ jobs:
       version: ${{ steps.next_version.outputs.version }}
       release_url: ${{ steps.create_draft_release.outputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
@@ -132,7 +132,7 @@ jobs:
     outputs:
       release_url: ${{ steps.upload_assets.outputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare-release.outputs.sha }}
 
