@@ -55,7 +55,7 @@ jobs:
 
       - name: Run e2e tests (installed CLI)
         shell: pwsh
-        env:
-          VBA_BIN_DIR: ${{ env.APPDATA }}\vbapm\bin
         run: |
+          $env:VBA_BIN_DIR = Join-Path $env:APPDATA "vbapm\bin"
+          Write-Output "Using VBA_BIN_DIR=$env:VBA_BIN_DIR"
           npm run test:e2e
