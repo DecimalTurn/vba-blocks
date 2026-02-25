@@ -1,3 +1,22 @@
+/**
+ * unpack.js — Developer utility script for extracting a .block archive.
+ *
+ * Usage:
+ *   node scripts/unpack <block> [dest]
+ *
+ * Arguments:
+ *   block   Path to the .block archive to extract.
+ *   dest    (Optional) Destination directory. Defaults to the archive path
+ *           with its extension removed (e.g. "foo/bar.block" → "foo/bar/").
+ *
+ * Examples:
+ *   node scripts/unpack tests/__fixtures__/.vbapm/packages/vba-blocks/json-v2.3.0.block
+ *   # Extracts to: tests/__fixtures__/.vbapm/packages/vba-blocks/json-v2.3.0/
+ *
+ *   node scripts/unpack tests/__fixtures__/.vbapm/packages/vba-blocks/dictionary-v1.4.1.block ./output/dictionary
+ *   # Extracts to: ./output/dictionary/
+ */
+
 const { resolve, dirname, basename, extname, join } = require("path");
 const mri = require("mri");
 const { ensureDir, pathExists } = require("fs-extra");

@@ -1,3 +1,13 @@
+/**
+ * zip.js — Utility function to create a zip archive from a set of files.
+ *
+ * This is used by the publish.js script to create a .block archive from the package files.
+ *
+ * Usage:
+ *   const zip = require("./lib/zip");
+ *   await zip({ "path/to/file1": "name/in/archive1", "path/to/file2": "name/in/archive2" }, "output.zip");
+ */
+
 const { createWriteStream } = require("fs");
 const { create: createArchive } = require("archiver");
 

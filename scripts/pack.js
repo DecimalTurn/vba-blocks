@@ -1,7 +1,35 @@
+/**
+ * pack.js — Developer utility script for packing a vbapm/vba-blocks package into a .block archive.
+ *
+ * Usage:
+ *   node scripts/pack <path/to/package/dir> [--force]
+ *
+ * Arguments:
+ *   dir     Path to the package directory containing a vbaproject.toml with a [package] section.
+ *
+ * Options:
+ *   --force   Overwrite an existing .block file if one already exists.
+ *
+ * Output:
+ *   Creates <dir>/build/<sanitized-name>-v<version>.block
+ *   e.g. node scripts/pack ./addins/vba-filesystem
+ *        → addins/vba-filesystem/build/vba-filesystem-v1.0.0.block
+ *
+ * What gets included in the archive:
+ *   - vbaproject.toml (the package manifest)
+ *   - All VBA source files listed under [src] in the manifest
+ *   - README / CHANGELOG / LICENSE / NOTICE files if present
+ *
+ * Notes:
+ *   - Package names containing "/" (scoped packages) are sanitized for use as filenames:
+ *     "/" is replaced with "--", other unsafe characters are replaced with "-".
+ *   - This script is also called internally by publish.js when a .block does not yet exist.
+ */
+
 const { dirname, resolve, relative, join } = require("path");
 const { ensureDir, pathExists, readFile, remove } = require("fs-extra");
 const mri = require("mri");
-const { parse } = require("toml-patch");
+const { parse } = require("@decimalturn/toml-patch");
 const ls = require("./lib/ls");
 const zip = require("./lib/zip");
 const sanitizeName = require("./lib/sanitize-name");

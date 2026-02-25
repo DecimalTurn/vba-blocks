@@ -1,3 +1,26 @@
+/**
+ * publish.js — Utility script for repository owner to publishing a VBA package to the vbapm/vba-blocks registry.
+ *
+ * Usage:
+ *   npx scripts/publish <path/to/package/dir> [--dryrun]
+ *
+ * What it does:
+ *   1. Reads the package manifest (vbaproject.toml) from the given directory.
+ *   2. Packs the package into a .block archive (if not already built).
+ *   3. Uploads the .block file to the S3 package store (packages.vba-blocks.com).
+ *   4. Validates the upload by downloading and comparing checksums.
+ *   5. Clones or pulls the registry git repository.
+ *   6. Appends a new JSON entry (name, version, deps, checksum) to the package's registry file.
+ *   7. Commits and pushes the registry change.
+ *
+ * Options:
+ *   --dryrun   Log all steps without actually uploading, writing, or pushing anything.
+ *
+ * Prerequisites:
+ *   - AWS credentials configured for S3 upload (via .env or environment variables).
+ *   - Git credentials with push access to the registry repository.
+ */
+
 const { promisify } = require("util");
 const { resolve, join } = require("path");
 const assert = require("assert");
@@ -5,7 +28,7 @@ const execFile = promisify(require("child_process").execFile);
 const { readFile, ensureFile, pathExists, writeFile } = require("fs-extra");
 const mri = require("mri");
 const tmpDir = promisify(require("tmp").dir);
-const { parse } = require("toml-patch");
+const { parse } = require("@decimalturn/toml-patch");
 const joinUrl = require("url-join");
 const checksum = require("./lib/checksum");
 const download = require("./lib/download");
