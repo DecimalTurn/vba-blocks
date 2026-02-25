@@ -22,7 +22,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Setup VBA runtime
         uses: DecimalTurn/setup-vba@main
@@ -30,7 +32,7 @@ jobs:
           office-apps: Excel
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
           node-version: 22.x
 
@@ -43,77 +45,7 @@ jobs:
       - name: Install CLI standalone App (local build)
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-
-          $libDir = Join-Path $env:APPDATA "vbapm"
-          $binDir = Join-Path $libDir "bin"
-          $addinsDir = Join-Path $libDir "addins\build"
-
-          Write-Output "Installing vbapm from local build artifacts"
-
-          New-Item -ItemType Directory -Force -Path $libDir | Out-Null
-
-          # Mirror packaged layout into %APPDATA%\vbapm (no zip extraction needed).
-          $sources = @("bin", "lib", "vendor", "run-scripts", "addins")
-          foreach ($source in $sources) {
-            $sourcePath = Join-Path $PWD $source
-            $destPath = Join-Path $libDir $source
-
-            if (!(Test-Path $sourcePath)) {
-              throw "Expected local build path not found: $sourcePath"
-            }
-
-            if (Test-Path $destPath) {
-              Remove-Item $destPath -Recurse -Force
-            }
-
-            Copy-Item $sourcePath $destPath -Recurse -Force
-          }
-
-          Write-Output "[3/5] Adding vbapm to PATH..."
-          $user = [EnvironmentVariableTarget]::User
-          $path = [Environment]::GetEnvironmentVariable('Path', $user)
-          if (!((";$path;").ToLower() -like "*;$binDir;*".ToLower())) {
-            [Environment]::SetEnvironmentVariable('Path', "$path;$binDir", $user)
-          }
-          $env:Path += ";$binDir"
-          $binDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          function New-Shortcut ($src, $dest) {
-            try {
-              $wshShell = New-Object -comObject WScript.Shell
-              $shortcut = $wshShell.CreateShortcut($dest)
-              $shortcut.TargetPath = $src
-              $shortcut.Save()
-            } catch {
-              Write-Output "Failed to link add-ins, they can instead be found in $addinsDir."
-            }
-          }
-
-          Write-Output "[4/5] Creating shortcut to add-ins..."
-          New-Shortcut "$addinsDir" "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
-
-          function Enable-VBOM ($app) {
-            try {
-              $curVer = Get-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\$app.Application\CurVer -ErrorAction Stop
-              $version = $curVer.'(default)'.replace("$app.Application.", "") + ".0"
-              Set-ItemProperty -Path HKCU:\Software\Microsoft\Office\$version\$app\Security -Name AccessVBOM -Value 1 -ErrorAction Stop
-            } catch {
-              Write-Output "Failed to enable access to VBA project object model for $app."
-            }
-          }
-
-          Write-Output "[5/5] Enabling access to VBA project object model..."
-          Enable-VBOM "Excel"
-
-          if (!(Test-Path (Join-Path $binDir "vba.cmd"))) {
-            throw "Expected vba.cmd in $binDir, but it was not found."
-          }
-
-      # - name: Install globally from local build
-      #   shell: pwsh
-      #   run: |
-      #     npm install -g .
+          .\installer\devinstall.ps1
 
       - name: Verify installation
         shell: pwsh
@@ -121,7 +53,9 @@ jobs:
           where.exe vba
           vba --version
 
-      - name: Run e2e tests
+      - name: Run e2e tests (installed CLI)
         shell: pwsh
         run: |
+          $env:VBA_BIN_DIR = Join-Path $env:APPDATA "vbapm\bin"
+          Write-Output "Using VBA_BIN_DIR=$env:VBA_BIN_DIR"
           npm run test:e2e

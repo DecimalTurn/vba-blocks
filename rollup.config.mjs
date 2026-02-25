@@ -3,8 +3,10 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import fs from "fs";
+import path from "path";
 
 const mode = process.env.NODE_ENV || "production";
 const builtins = new Set(builtin);
@@ -23,8 +25,6 @@ function shebang() {
 			return null;
 		},
 		writeBundle(options, bundle) {
-			const fs = require("fs");
-			const path = require("path");
 			for (const [fileName] of Object.entries(bundle)) {
 				if (fileName === "vbapm.js") {
 					const filePath = path.resolve(options.dir, fileName);
@@ -48,12 +48,16 @@ export default [
 			sourcemap: false,
 			exports: "auto"
 		},
+		// archiver must stay external due to circular CJS deps that break bundling.
+		// See scripts/ensure-vendor.js for details. Run "npm run check:archiver"
+		// to test if this workaround can be removed.
 		external(id) {
-			return id === "archiver" || builtins.has(id) || id.startsWith("node:");
+			return builtins.has(id) || id.startsWith("node:");
 		},
 		plugins: [
 			resolve(),
 			replace({
+				preventAssignment: true,
 				"process.env.NODE_ENV": JSON.stringify(mode),
 				"process.env.READABLE_STREAM": '"disable"',
 				"require.cache": "{}"
@@ -64,7 +68,6 @@ export default [
 			json(),
 			typescript(),
 			mode === "production" && terser(),
-			readableStream(),
 			debug(),
 			workerThreads(),
 			shebang()
@@ -82,6 +85,7 @@ export default [
 	}
 ];
 
+// Deprecated
 // Explicitly export modern API from readable-stream
 // (exclude fallback API)
 function readableStream() {
