@@ -44,8 +44,7 @@
         "build:dev": "cross-env NODE_ENV=development rollup -c",
         "build:addins": "cd addins && node --no-warnings ../scripts/build-addins",
         "build:bootstrap": "cd scripts/bootstrap && node --no-warnings ../../lib/vbapm build",
-        "clean": "rimraf lib && rimraf dist && rimraf addins/build",
-        "check:archiver": "node scripts/check-archiver-bundling"
+        "clean": "rimraf lib && rimraf dist && rimraf addins/build"
     },
     "jest": {
         "preset": "ts-jest",
@@ -63,6 +62,7 @@
         }
     },
     "dependencies": {
+        "@decimalturn/toml-patch": "^0.7",
         "@timhall/ansi-colors": "^5.0.0",
         "@timhall/dedent": "^0.9.1",
         "archiver": "^7.0.1",
@@ -83,16 +83,16 @@
         "sanitize-filename": "^1",
         "semver": "^5",
         "tmp": "^0.2.5",
-        "@decimalturn/toml-patch": "^0.7",
         "walk-sync": "^4.0.1",
         "xml-js": "^1.6"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^15.1.0",
-        "@rollup/plugin-json": "^4.1.0",
-        "@rollup/plugin-node-resolve": "^9.0.0",
-        "@rollup/plugin-replace": "^2.3.3",
-        "@rollup/plugin-typescript": "^6.0.0",
+        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-replace": "^6.0.2",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^12.1.2",
         "@types/archiver": "^2",
         "@types/fs-extra": "^5",
         "@types/jest": "^29",
@@ -109,8 +109,7 @@
         "npm-run-all": "^4",
         "prettier": "^3",
         "rimraf": "^6.1.3",
-        "rollup": "^2.32.1",
-        "rollup-plugin-terser": "^7.0.2",
+        "rollup": "^4.34.9",
         "ts-jest": "^29",
         "tslib": "^1.9.3",
         "typescript": "^5",
@@ -133,7 +132,6 @@
             "scripts.build:addins": "Builds the add-ins by running a custom build script in the addins directory",
             "scripts.build:bootstrap": "Update the bootstrap file (used to build the addin) by using the latest addin build (inception!)",
             "scripts.clean": "Removes generated files from lib, dist, and addins/build directories",
-            "scripts.check:archiver": "Validates that the archiver vendoring workaround is still needed (exit 0 = still needed, exit 1 = can be removed). See scripts/check-archiver-bundling.js.",
             "devDependencies.cross-env": "Used to set environment variables in a cross-platform-compatible way for build scripts",
             "overrides": "Pins vulnerable transitive dependencies to patched versions to remove critical npm audit findings without large upstream upgrades.",
             "overrides.minimist": "Prototype pollution fix, mainly needed for ts-jest/handlebars transitive chain.",
