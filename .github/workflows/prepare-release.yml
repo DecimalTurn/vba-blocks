@@ -90,7 +90,7 @@ jobs:
         run: |
             if [[ "${{ github.event.inputs.version_bump }}" != "no-bump" ]]; then
               NEW_VERSION="${{ steps.next_version.outputs.version }}"
-              jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
+              jq --indent 4 --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
               mv package.json.tmp package.json
             else
               echo "Skipping package.json update (no-bump selected)"
