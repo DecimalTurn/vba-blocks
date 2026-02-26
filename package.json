@@ -64,7 +64,7 @@
     "dependencies": {
         "@decimalturn/toml-patch": "^0.7",
         "@timhall/ansi-colors": "^5.0.0",
-        "@timhall/dedent": "^0.9.1",
+        "@timhall/dedent": "^0.10.0",
         "archiver": "^7.0.1",
         "conf": "^3",
         "date-fns": "^2",
