@@ -18,7 +18,7 @@ jobs:
   excel-integration:
     strategy:
       matrix:
-        os: [windows-2022, windows-2025]
+        os: [windows-2025]
     runs-on: ${{ matrix.os }}
 
     steps:
